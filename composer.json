@@ -1,0 +1,21 @@
+{
+    "name": "vda/datasource",
+    "type": "library",
+    "description": "Set of interfaces and implementations for data access",
+    "keywords": ["datasource", "persistence"],
+    "require": {
+        "php": ">=5.3.23",
+        "vda/query": "self.version",
+        "vda/util": "self.version"
+    },
+    "autoload": {
+        "psr-0": { "": "" }
+    },
+    "target-dir": "Vda/Datasource",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-trunk": "1-dev"
+        }
+    }
+}
