@@ -1,5 +1,5 @@
 <?php
-namespace Vda\Datasource\Relational\Driver\Mysql;
+namespace Vda\Datasource\Relational\Driver\Mysqli;
 
 use Vda\Datasource\Relational\Driver\IResult;
 
@@ -7,29 +7,29 @@ class MysqlResult implements IResult
 {
     private $rs;
 
-    public function __construct($rs)
+    public function __construct(\mysqli_result $rs)
     {
         $this->rs = $rs;
     }
 
     public function numRows()
     {
-        return mysql_num_rows($this->rs);
+        return $this->rs->num_rows;
     }
 
     public function fetch()
     {
-        return mysql_fetch_assoc($this->rs);
+        return $this->rs->fetch_assoc();
     }
 
     public function fetchTuple()
     {
-        return mysql_fetch_row($this->rs);
+        return $this->rs->fetch_row();
     }
 
     public function fetchVal($offset = 0)
     {
-        $row = mysql_fetch_row($this->rs);
+        $row = $this->rs->fetch_row();
 
         return empty($row) ? null : $row[$offset];
     }
@@ -38,7 +38,7 @@ class MysqlResult implements IResult
     {
         $result = array();
 
-        while ($row = mysql_fetch_assoc($this->rs)) {
+        while ($row = $this->rs->fetch_assoc($result)) {
             $result[] = $row;
         }
 
