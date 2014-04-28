@@ -61,7 +61,7 @@ class FileStorage implements IStorage
             $expire = $this->getExpirationTime($key) - time();
             $this->updateParam(
                 $key,
-                is_numerick($current) ? $current + $delta : $delta,
+                is_numeric($current) ? $current + $delta : $delta,
                 $expire
             );
         }
@@ -100,8 +100,8 @@ class FileStorage implements IStorage
         if ($isUpdated) {
             if ($expire < 0) {
                 unset(
-                    $this->data['values'][$name],
-                    $this->data['expires'][$name]
+                    $this->data['values'][$key],
+                    $this->data['expires'][$key]
                 );
             } else {
                 $this->data['values'][$key] = $value;
@@ -167,7 +167,7 @@ class FileStorage implements IStorage
         ftruncate($this->handle, 0);
         $data = serialize($this->data);
         if (fwrite($this->handle, $data) === false) {
-            throw new DatasourceException("Unable to open file for reading/writing: {$filename}");
+            throw new DatasourceException("Unable to open file for reading/writing: {$this->filename}");
         }
     }
 
@@ -184,10 +184,10 @@ class FileStorage implements IStorage
         return null;
     }
 
-    private function lock($exlusive)
+    private function lock($exclusive)
     {
         if ($this->lockCount == 0) {
-            flock($this->handle, $exlusive ? LOCK_EX : LOCK_SH);
+            flock($this->handle, $exclusive ? LOCK_EX : LOCK_SH);
         }
 
         $this->lockCount++;

@@ -7,6 +7,10 @@ use Vda\Datasource\Relational\Driver\IConnection;
 class MysqlConnection implements IConnection
 {
     private $dsn;
+
+    /**
+     * @var \mysqli
+     */
     private $mysql;
 
     /**
@@ -138,12 +142,10 @@ class MysqlConnection implements IConnection
             'socket'     => null,
         );
 
-        $persistent = false;
-        $charset = 'utf8';
-
         $result['host'] = $params['host'];
+
         if (!empty($params['port'])) {
-            $result['host'] .= ':' . $params['port'];
+            $result['port'] = $params['port'];
         }
 
         if (isset($params['user'])) {

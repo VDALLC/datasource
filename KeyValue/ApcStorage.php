@@ -3,8 +3,6 @@ namespace Vda\Datasource\KeyValue;
 
 use Vda\Datasource\DatasourceException;
 
-use \Memcache;
-
 class ApcStorage implements IStorage
 {
     public function __construct()
@@ -23,7 +21,7 @@ class ApcStorage implements IStorage
 
     public function getExpirationTime($key)
     {
-        return apch_fetch('exp:' . $key);
+        return apc_fetch('exp:' . $key);
     }
 
     public function add($key, $value, $ttl = 0)
