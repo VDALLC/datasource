@@ -5,8 +5,8 @@
     "keywords": ["datasource", "persistence"],
     "require": {
         "php": ">=5.3.23",
-        "vda/query": "self.version",
-        "vda/util": "self.version"
+        "vda/query": "0.11.*",
+        "vda/util": "0.11.*"
     },
     "autoload": {
         "psr-0": { "": "" }
