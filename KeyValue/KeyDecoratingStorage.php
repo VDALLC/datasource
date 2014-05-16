@@ -4,7 +4,7 @@ namespace Vda\Datasource\KeyValue;
 class KeyDecoratingStorage implements IStorage
 {
     /**
-     *@var IStorage;
+     * @var IStorage
      */
     private $backend;
     private $decorator;
@@ -27,7 +27,7 @@ class KeyDecoratingStorage implements IStorage
 
     public function getExpirationTime($key)
     {
-        return $this->backend->get($this->decorate($key));
+        return $this->backend->getExpirationTime($this->decorate($key));
     }
 
     public function add($key, $value, $ttl = 0)
