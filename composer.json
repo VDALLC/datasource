@@ -6,16 +6,11 @@
     "require": {
         "php": ">=5.3.23",
         "vda/query": "0.11.*",
+        "vda/transaction": "0.1.*",
         "vda/util": "0.11.*"
     },
     "autoload": {
-        "psr-0": { "": "" }
+        "psr-4": { "Vda\\Datasource\\": "src/" }
     },
-    "target-dir": "Vda/Datasource",
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-trunk": "1-dev"
-        }
-    }
+    "minimum-stability": "dev"
 }

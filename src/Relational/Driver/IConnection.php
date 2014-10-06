@@ -2,8 +2,9 @@
 namespace Vda\Datasource\Relational\Driver;
 
 use Vda\Datasource\DatasourceException;
+use Vda\Transaction\ISavepointCapable;
 
-interface IConnection
+interface IConnection extends ISavepointCapable
 {
     /**
      * Establish connection to the server described by $dsn

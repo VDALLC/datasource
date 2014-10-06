@@ -3,11 +3,16 @@ namespace Vda\Datasource\Relational\Driver\Mysql;
 
 use Vda\Datasource\DatasourceException;
 use Vda\Datasource\Relational\Driver\IConnection;
+use Vda\Transaction\CompositeTransactionListener;
+use Vda\Transaction\TransactionException;
+use Vda\Transaction\ITransactionListener;
 
 class MysqlConnection implements IConnection
 {
     private $dsn;
     private $conn;
+    private $isTransactionStarted;
+    private $listeners;
 
     /**
      * Connect to database described by $dsn
@@ -24,6 +29,9 @@ class MysqlConnection implements IConnection
         if ($dsn !== false) {
             $this->connect($dsn);
         }
+
+        $this->isTransactionStarted = false;
+        $this->listeners = new CompositeTransactionListener();
     }
 
     public function connect($dsn, $closePrevious = false)
@@ -74,8 +82,15 @@ class MysqlConnection implements IConnection
     {
         if ($this->isConnected()) {
             mysql_close($this->conn);
-            $this->conn = null;
         }
+
+        $this->conn = null;
+
+        if ($this->isTransactionStarted) {
+            $this->listeners->onTransactionRollback($this);
+        }
+
+        $this->isTransactionStarted = false;
     }
 
     public function isConnected()
@@ -116,6 +131,108 @@ class MysqlConnection implements IConnection
     public function getDialect()
     {
         return new MysqlDialect($this->conn);
+    }
+
+    public function begin()
+    {
+        if ($this->isTransactionStarted) {
+            throw new TransactionException('Transaction is already started');
+        }
+
+        try {
+            $this->query('BEGIN');
+            $this->isTransactionStarted = true;
+            $this->listeners->onTransactionBegin($this);
+        } catch (DatasourceException $e) {
+            throw new TransactionException('Unable to start transaction', 0, $e);
+        }
+    }
+
+    public function commit()
+    {
+        if (!$this->isTransactionStarted) {
+            throw new TransactionException('Commit failed, transaction is not started');
+        }
+
+        try {
+            $this->query('COMMIT');
+            $this->isTransactionStarted = false;
+            $this->listeners->onTransactionCommit($this);
+        } catch (DatasourceException $e) {
+            throw new TransactionException('Unable to commit transaction', 0, $e);
+        }
+    }
+
+    public function rollback()
+    {
+        if (!$this->isTransactionStarted) {
+            throw new TransactionException('Rollback failed, transaction is not started');
+        }
+
+        try {
+            $this->query('ROLLBACK');
+            $this->isTransactionStarted = false;
+            $this->listeners->onTransactionRollback($this);
+        } catch (DatasourceException $e) {
+            throw new TransactionException('Unable to rollback transaction', 0, $e);
+        }
+    }
+
+    public function savepoint($savepoint)
+    {
+        if (!$this->isTransactionStarted) {
+            throw new TransactionException('Savepoint creation failed, transaction is not started');
+        }
+
+        try {
+            $this->query('SAVEPOINT ' . $this->getDialect()->quoteIdentifier($savepoint));
+            $this->listeners->onSavepointCreate($this, $savepoint);
+        } catch (DatasourceException $e) {
+            throw new TransactionException('Unable to rollback transaction', 0, $e);
+        }
+    }
+
+    public function release($savepoint)
+    {
+        if (!$this->isTransactionStarted) {
+            throw new TransactionException('Savepoint release failed, transaction is not started');
+        }
+
+        try {
+            $this->query('RELEASE SAVEPOINT ' . $this->getDialect()->quoteIdentifier($savepoint));
+            $this->listeners->onSavepointRelease($this, $savepoint);
+        } catch (DatasourceException $e) {
+            throw new TransactionException('Unable to release savepoint', 0, $e);
+        }
+    }
+
+    public function rollbackTo($savepoint)
+    {
+        if (!$this->isTransactionStarted) {
+            throw new TransactionException('Rollback to savepoint failed, transaction is not started');
+        }
+
+        try {
+            $this->query('ROLLBACK TO ' . $this->getDialect()->quoteIdentifier($savepoint));
+            $this->listeners->onSavepointRollback($this, $savepoint);
+        } catch (DatasourceException $e) {
+            throw new TransactionException('Unable to rollback to savepoint', 0, $e);
+        }
+    }
+
+    public function isTransactionStarted()
+    {
+        return $this->isTransactionStarted;
+    }
+
+    public function addTransactionListener(ITransactionListener $listener)
+    {
+        $this->listeners->addListener($listener);
+    }
+
+    public function removeTransactionListener(ITransactionListener $listener)
+    {
+        $this->listeners->removeListener($listener);
     }
 
     private function parseDsn($dsn)

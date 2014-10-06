@@ -2,14 +2,16 @@
 namespace Vda\Datasource\Relational;
 
 use Psr\Log\LoggerInterface;
-use Vda\Datasource\IRepository;
+use Vda\Datasource\ISavepointCapableRepository;
 use Vda\Datasource\Relational\Driver\IConnection;
 use Vda\Query\Select;
 use Vda\Query\Insert;
 use Vda\Query\Update;
 use Vda\Query\Delete;
+use Vda\Transaction\DecoratingTransactionListener;
+use Vda\Transaction\ITransactionListener;
 
-class Repository implements IRepository
+class Repository implements ISavepointCapableRepository
 {
     private $conn;
     private $qb;
@@ -20,6 +22,8 @@ class Repository implements IRepository
         $this->conn = $conn;
         $this->logger = $logger;
         $this->qb = new QueryBuilder($conn->getDialect());
+        $this->listener = new DecoratingTransactionListener($this);
+        $this->conn->addTransactionListener($this->listener);
     }
 
     public function select(Select $select)
@@ -44,10 +48,6 @@ class Repository implements IRepository
         return $accumulator->getResult();
     }
 
-    /**
-     * @param Insert $insert
-     * @return integer Number of affected rows
-     */
     public function insert(Insert $insert)
     {
         $q = $this->qb->build($insert);
@@ -57,10 +57,6 @@ class Repository implements IRepository
         return $this->conn->exec($q);
     }
 
-    /**
-     * @param Update $update
-     * @return integer Number of affected rows
-    */
     public function update(Update $update)
     {
         $q = $this->qb->build($update);
@@ -70,10 +66,6 @@ class Repository implements IRepository
         return $this->conn->exec($q);
     }
 
-    /**
-     * @param Delete $delete
-     * @return integer Number of affected rows
-    */
     public function delete(Delete $delete)
     {
         $q = $this->qb->build($delete);
@@ -83,11 +75,53 @@ class Repository implements IRepository
         return $this->conn->exec($q);
     }
 
-    /**
-     * @return integer Value of autoincrement field if available
-    */
     public function getLastInsertId()
     {
         return $this->conn->lastInsertId();
+    }
+
+    public function begin()
+    {
+        $this->conn->begin();
+    }
+
+    public function savepoint($savepoint)
+    {
+        $this->conn->savepoint($savepoint);
+    }
+
+    public function release($savepoint)
+    {
+        $this->conn->release($savepoint);
+    }
+
+    public function rollbackTo($savepoint)
+    {
+        $this->conn->rollbackTo($savepoint);
+    }
+
+    public function commit()
+    {
+        $this->conn->commit();
+    }
+
+    public function rollback()
+    {
+        $this->conn->rollback();
+    }
+
+    public function isTransactionStarted()
+    {
+        return $this->conn->isTransactionStarted();
+    }
+
+    public function addTransactionListener(ITransactionListener $listener)
+    {
+        $this->listener->addListener($listener);
+    }
+
+    public function removeTransactionListener(ITransactionListener $listener)
+    {
+        $this->listener->removeListener($listener);
     }
 }
