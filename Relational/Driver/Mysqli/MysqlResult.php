@@ -38,7 +38,7 @@ class MysqlResult implements IResult
     {
         $result = array();
 
-        while ($row = $this->rs->fetch_assoc($result)) {
+        while ($row = $this->rs->fetch_assoc()) {
             $result[] = $row;
         }
 
