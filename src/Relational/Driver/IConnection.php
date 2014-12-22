@@ -2,6 +2,7 @@
 namespace Vda\Datasource\Relational\Driver;
 
 use Vda\Datasource\DatasourceException;
+use Vda\Datasource\Relational\IQueryBuilder;
 use Vda\Transaction\ISavepointCapable;
 
 /**
@@ -55,4 +56,11 @@ interface IConnection extends ISavepointCapable
     public function getDialect();
 
     public function escapeString($str);
+
+    /**
+     * Return a query builder specific for this driver
+     *
+     * @return IQueryBuilder
+     */
+    public function getQueryBuilder();
 }

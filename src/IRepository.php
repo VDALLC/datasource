@@ -4,6 +4,7 @@ namespace Vda\Datasource;
 use Vda\Query\Delete;
 use Vda\Query\Insert;
 use Vda\Query\Update;
+use Vda\Query\Upsert;
 
 interface IRepository extends IDatasource
 {
@@ -12,6 +13,12 @@ interface IRepository extends IDatasource
      * @return integer Number of affected rows
      */
     public function insert(Insert $insert);
+
+    /**
+     * @param Upsert $Upsert
+     * @return integer Number of affected rows
+     */
+    public function upsert(Upsert $upsert);
 
     /**
      * @param Update $update

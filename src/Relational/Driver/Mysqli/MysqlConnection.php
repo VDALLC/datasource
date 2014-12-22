@@ -18,6 +18,7 @@ class MysqlConnection implements IConnection
 
     private $isTransactionStarted;
     private $listeners;
+    private $builderStateFactory;
 
     /**
      * Connect to database described by $dsn
@@ -38,6 +39,8 @@ class MysqlConnection implements IConnection
         if ($autoConnect) {
             $this->connect();
         }
+
+        $this->builderStateFactory = new MysqlQueryBuilderStateFactory();
     }
 
     public function connect($closePrevious = false)
@@ -126,6 +129,11 @@ class MysqlConnection implements IConnection
     public function getDialect()
     {
         return new MysqlDialect($this);
+    }
+
+    public function getQueryBuilder()
+    {
+        return new MysqlQueryBuilder($this->getDialect(), $this->builderStateFactory);
     }
 
     public function begin()

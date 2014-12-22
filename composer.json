@@ -11,9 +11,9 @@
     ],
     "require": {
         "php": ">=5.3.23",
-        "vda/query": "0.11.*",
+        "vda/query": "0.12.*",
         "vda/transaction": "0.1.*",
-        "vda/util": "0.11.*"
+        "vda/util": "0.12.*"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",

@@ -22,10 +22,12 @@ use Vda\Query\Select;
 use Vda\Query\Table;
 use Vda\Query\Update;
 use Vda\Util\Type;
+use Vda\Query\Merge;
+use Vda\Query\Upsert;
 
-class QueryBuilder implements IQueryProcessor
+class QueryBuilder implements IQueryBuilder, IQueryProcessor
 {
-    private static $patternSubstitute = array(
+    protected static $patternSubstitute = array(
         '\\\\' => '\\',
         '\\?' => '?',
         '\\*' => '*',
@@ -33,7 +35,7 @@ class QueryBuilder implements IQueryProcessor
         '*' => '%'
     );
 
-    private static $opcodes = array(
+    protected static $opcodes = array(
         Operator::MNEMONIC_COMPOSITE_AND => ' AND ',
         Operator::MNEMONIC_COMPOSITE_OR  => ' OR ',
         Operator::MNEMONIC_COMPOSITE_PLUS => ' + ',
@@ -43,35 +45,41 @@ class QueryBuilder implements IQueryProcessor
     /**
      * @var ISqlDialect
      */
-    private $dialect;
+    protected $dialect;
 
+    /**
+     * @var QueryBuilderStateFactory
+     */
+    protected $stateFactory;
     /**
      * @var QueryBuilderState[]
      */
-    private $stateStack;
+    protected $stateStack;
 
     /**
      * @var QueryBuilderState
      */
-    private $currentState;
+    protected $currentState;
 
-    private $sourceGlueStack;
-    private $currentSourceGlue;
+    protected $sourceGlueStack;
+    protected $currentSourceGlue;
 
     /**
      * @var string
      */
-    private $query;
+    protected $query;
 
-    public function __construct(ISqlDialect $dialect)
+    public function __construct(ISqlDialect $dialect, QueryBuilderStateFactory $stateFactory)
     {
         $this->dialect = $dialect;
+        $this->stateFactory = $stateFactory;
     }
+
     public function build(IQueryPart $processable)
     {
         $this->query = '';
         $this->stateStack = array();
-        $this->currentState = QueryBuilderState::root();
+        $this->currentState = $this->stateFactory->root();
         $this->sourceGlueStack = array();
         $this->currentSourceGlue = '';
 
@@ -86,7 +94,7 @@ class QueryBuilder implements IQueryProcessor
             $this->query .= '(';
         }
 
-        $this->enterState(QueryBuilderState::select());
+        $this->enterState($this->stateFactory->select());
 
         $this->query .= 'SELECT ';
 
@@ -94,7 +102,7 @@ class QueryBuilder implements IQueryProcessor
         $this->buildSources(' FROM ', $select->getSources());
         $this->buildCriteria(' WHERE ', $select->getCriteria());
 
-        $this->enterState(QueryBuilderState::groupOrderClause());
+        $this->enterState($this->stateFactory->groupOrderClause());
         $this->buildGroups($select->getGroups());
         $this->buildOrders($select->getOrders());
         $this->leaveState();
@@ -114,7 +122,7 @@ class QueryBuilder implements IQueryProcessor
             throw new \RuntimeException("Insert query must be a root object");
         }
 
-        $this->enterState(QueryBuilderState::insert());
+        $this->enterState($this->stateFactory->insert());
 
         $this->query = 'INSERT INTO ';
 
@@ -143,9 +151,9 @@ class QueryBuilder implements IQueryProcessor
             throw new \RuntimeException("Update query must be a root object");
         }
 
-        $this->enterState(QueryBuilderState::update());
+        $this->enterState($this->stateFactory->update());
 
-        $this->query .= 'UPDATE ';
+        $this->query = 'UPDATE ';
 
         $this->buildSources('', $update->getTables());
 
@@ -158,13 +166,46 @@ class QueryBuilder implements IQueryProcessor
         $this->leaveState();
     }
 
+    public function processUpsertQuery(Upsert $merge)
+    {
+        if (!$this->currentState->isRoot()) {
+            throw new \RuntimeException("Upsert query must be a root object");
+        }
+
+        $this->enterState($this->stateFactory->upsert());
+
+        $this->query = 'MERGE INTO ';
+
+        $merge->getTable()->onProcess($this);
+
+        $this->query .= ' USING DUAL ON ';
+
+        $merge->getCriteria()->onProcess($this);
+
+        $this->query .= ' WHEN MATCHED THEN UPDATE ';
+
+        $this->buildUpdateList($merge->getUpdateFields(), $merge->getUpdateValues());
+
+        $this->query .= ' WHEN NOT MATCHED THEN INSERT ';
+
+        $this->query .= ' (';
+        $this->buildExpressions($merge->getInsertFields(), ', ');
+        $this->query .= ') ';
+
+        $this->query .= ' VALUES (';
+        $this->buildExpressions($merge->getInsertValues(), ', ');
+        $this->query .= ') ';
+
+        $this->leaveState();
+    }
+
     public function processDeleteQuery(Delete $delete)
     {
         if (!$this->currentState->isRoot()) {
             throw new \RuntimeException("Delete query must be a root object");
         }
 
-        $this->enterState(QueryBuilderState::delete());
+        $this->enterState($this->stateFactory->delete());
 
         $this->query .= 'DELETE ';
 
@@ -370,29 +411,29 @@ class QueryBuilder implements IQueryProcessor
         $this->query .= ' ' . $order->getDirection();
     }
 
-    private function onInvalidMnemonic($type, $mnemonic)
+    protected function onInvalidMnemonic($type, $mnemonic)
     {
         throw new \UnexpectedValueException(
             "Unsupported {$type} operator mnemonic: '{$mnemonic}'"
         );
     }
 
-    private function renderBoolean($value)
+    protected function renderBoolean($value)
     {
         return $this->dialect->quote($value, Type::BOOLEAN);
     }
 
-    private function renderString($value)
+    protected function renderString($value)
     {
         return $this->dialect->quote($value, Type::STRING);
     }
 
-    private function renderNumeric($value)
+    protected function renderNumeric($value)
     {
         return $this->dialect->quote($value, Type::NUMERIC);
     }
 
-    private function buildExpressions($expressions, $glue)
+    protected function buildExpressions($expressions, $glue)
     {
         $currentGlue = '';
         foreach ($expressions as $e) {
@@ -402,9 +443,8 @@ class QueryBuilder implements IQueryProcessor
         }
     }
 
-    private function buildSources($prefix, $sources)
+    protected function buildSources($prefix, $sources)
     {
-
         if (!empty($sources)) {
             array_push($this->sourceGlueStack, $this->currentSourceGlue);
             $this->currentSourceGlue = '';
@@ -420,7 +460,7 @@ class QueryBuilder implements IQueryProcessor
         }
     }
 
-    private function buildUpdateList($fields, $expressions)
+    protected function buildUpdateList($fields, $expressions)
     {
         $glue = '';
         foreach ($fields as $i => $f) {
@@ -432,7 +472,7 @@ class QueryBuilder implements IQueryProcessor
         }
     }
 
-    private function buildCriteria($prefix, $criteria)
+    protected function buildCriteria($prefix, $criteria)
     {
         if ($criteria !== null) {
             $this->query .= $prefix;
@@ -440,7 +480,7 @@ class QueryBuilder implements IQueryProcessor
         }
     }
 
-    private function buildGroups($groups)
+    protected function buildGroups($groups)
     {
         if ($groups != null) {
             $this->query .= ' GROUP BY ';
@@ -448,7 +488,7 @@ class QueryBuilder implements IQueryProcessor
         }
     }
 
-    private function buildOrders($orders)
+    protected function buildOrders($orders)
     {
         if ($orders != null) {
             $this->query .= ' ORDER BY ';
@@ -456,14 +496,14 @@ class QueryBuilder implements IQueryProcessor
         }
     }
 
-    private function buildLimits($limit, $offset)
+    protected function buildLimits($limit, $offset)
     {
         if ($limit !== null) {
             $this->query .= ' ' . $this->dialect->limitClause($limit, $offset);
         }
     }
 
-    private function renderValue($value, $type)
+    protected function renderValue($value, $type)
     {
         if ($value instanceof IExpression) {
             $value->onProcess($this);
@@ -475,13 +515,13 @@ class QueryBuilder implements IQueryProcessor
         }
     }
 
-    private function enterState(QueryBuilderState $state)
+    protected function enterState(QueryBuilderState $state)
     {
         array_push($this->stateStack, $this->currentState);
         $this->currentState = $state;
     }
 
-    private function leaveState()
+    protected function leaveState()
     {
         $this->currentState = array_pop($this->stateStack);
     }

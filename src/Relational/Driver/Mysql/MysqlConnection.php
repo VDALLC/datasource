@@ -3,6 +3,9 @@ namespace Vda\Datasource\Relational\Driver\Mysql;
 
 use Vda\Datasource\DatasourceException;
 use Vda\Datasource\Relational\Driver\IConnection;
+use Vda\Datasource\Relational\Driver\Mysqli\MysqlDialect;
+use Vda\Datasource\Relational\Driver\Mysqli\MysqlQueryBuilder;
+use Vda\Datasource\Relational\Driver\Mysqli\MysqlQueryBuilderStateFactory;
 use Vda\Transaction\CompositeTransactionListener;
 use Vda\Transaction\TransactionException;
 use Vda\Transaction\ITransactionListener;
@@ -13,6 +16,7 @@ class MysqlConnection implements IConnection
     private $conn;
     private $isTransactionStarted;
     private $listeners;
+    private $builderStateFactory;
 
     /**
      * Connect to database described by $dsn
@@ -30,6 +34,8 @@ class MysqlConnection implements IConnection
 
         $this->isTransactionStarted = false;
         $this->listeners = new CompositeTransactionListener();
+
+        $this->builderStateFactory = new MysqlQueryBuilderStateFactory();
     }
 
     public function connect($closePrevious = false)
@@ -125,6 +131,11 @@ class MysqlConnection implements IConnection
     public function getDialect()
     {
         return new MysqlDialect($this);
+    }
+
+    public function getQueryBuilder()
+    {
+        return new MysqlQueryBuilder($this->getDialect(), $this->builderStateFactory);
     }
 
     public function begin()

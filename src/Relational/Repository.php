@@ -4,10 +4,11 @@ namespace Vda\Datasource\Relational;
 use Psr\Log\LoggerInterface;
 use Vda\Datasource\ISavepointCapableRepository;
 use Vda\Datasource\Relational\Driver\IConnection;
-use Vda\Query\Select;
-use Vda\Query\Insert;
-use Vda\Query\Update;
 use Vda\Query\Delete;
+use Vda\Query\Insert;
+use Vda\Query\Select;
+use Vda\Query\Update;
+use Vda\Query\Upsert;
 use Vda\Transaction\DecoratingTransactionListener;
 use Vda\Transaction\ITransactionListener;
 
@@ -21,7 +22,7 @@ class Repository implements ISavepointCapableRepository
     {
         $this->conn = $conn;
         $this->logger = $logger;
-        $this->qb = new QueryBuilder($conn->getDialect());
+        $this->qb = $conn->getQueryBuilder();
         $this->listener = new DecoratingTransactionListener($this);
         $this->conn->addTransactionListener($this->listener);
     }
@@ -51,27 +52,44 @@ class Repository implements ISavepointCapableRepository
     public function insert(Insert $insert)
     {
         $q = $this->qb->build($insert);
+
         if ($this->logger) {
             $this->logger->debug($q);
         }
+
+        return $this->conn->exec($q);
+    }
+
+    public function upsert(Upsert $upsert)
+    {
+        $q = $this->qb->build($upsert);
+
+        if ($this->logger) {
+            $this->logger->debug($q);
+        }
+
         return $this->conn->exec($q);
     }
 
     public function update(Update $update)
     {
         $q = $this->qb->build($update);
+
         if ($this->logger) {
             $this->logger->debug($q);
         }
+
         return $this->conn->exec($q);
     }
 
     public function delete(Delete $delete)
     {
         $q = $this->qb->build($delete);
+
         if ($this->logger) {
             $this->logger->debug($q);
         }
+
         return $this->conn->exec($q);
     }
 

@@ -92,7 +92,7 @@ class MysqlDialect implements ISqlDialect
         return $result;
     }
 
-    private function escapeString($str, $encl)
+    protected function escapeString($str, $encl)
     {
         return $encl . $this->conn->escapeString($str) . $encl;
     }
