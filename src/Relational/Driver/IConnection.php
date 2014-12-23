@@ -46,4 +46,6 @@ interface IConnection extends ISavepointCapable
      * @return ISqlDialect
      */
     public function getDialect();
+
+    public function escapeString($str);
 }

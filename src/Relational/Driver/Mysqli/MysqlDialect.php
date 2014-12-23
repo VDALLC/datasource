@@ -1,16 +1,17 @@
 <?php
 namespace Vda\Datasource\Relational\Driver\Mysqli;
 
+use Vda\Datasource\Relational\Driver\IConnection;
 use Vda\Datasource\Relational\Driver\ISqlDialect;
 use Vda\Util\Type;
 
 class MysqlDialect implements ISqlDialect
 {
-    private $mysql;
+    private $conn;
 
-    public function __construct(\mysqli $mysql = null)
+    public function __construct(IConnection $conn = null)
     {
-        $this->mysql = $mysql;
+        $this->conn = $conn;
     }
 
     public function quote($literal, $type)
@@ -93,10 +94,6 @@ class MysqlDialect implements ISqlDialect
 
     private function escapeString($str, $encl)
     {
-        if (empty($this->mysql)) {
-            return $encl . addslashes($str) . $encl;
-        } else {
-            return $encl . $this->mysql->real_escape_string($str) . $encl;
-        }
+        return $encl . $this->conn->escapeString($str) . $encl;
     }
 }

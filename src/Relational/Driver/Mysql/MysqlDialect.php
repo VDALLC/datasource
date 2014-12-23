@@ -8,7 +8,7 @@ class MysqlDialect implements ISqlDialect
 {
     private $conn;
 
-    public function __construct($conn)
+    public function __construct(MysqlConnection $conn)
     {
         $this->conn = $conn;
     }
@@ -93,10 +93,6 @@ class MysqlDialect implements ISqlDialect
 
     private function escapeString($str)
     {
-        if (empty($this->conn)) {
-            return addslashes($str);
-        } else {
-            return mysql_real_escape_string($str, $this->conn);
-        }
+        return $this->conn->escapeString($str);
     }
 }

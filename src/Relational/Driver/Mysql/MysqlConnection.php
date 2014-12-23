@@ -126,7 +126,7 @@ class MysqlConnection implements IConnection
 
     public function getDialect()
     {
-        return new MysqlDialect($this->conn);
+        return new MysqlDialect($this);
     }
 
     public function begin()
@@ -282,5 +282,14 @@ class MysqlConnection implements IConnection
         }
 
         return $result;
+    }
+
+    public function escapeString($str)
+    {
+        if ($this->conn) {
+            return mysql_real_escape_string($str, $this->conn);
+        } else {
+            return mysql_escape_string($str);
+        }
     }
 }
