@@ -372,7 +372,7 @@ class QueryBuilder implements IQueryProcessor
 
     private function onInvalidMnemonic($type, $mnemonic)
     {
-        throw new UnexpectedValueException(
+        throw new \UnexpectedValueException(
             "Unsupported {$type} operator mnemonic: '{$mnemonic}'"
         );
     }

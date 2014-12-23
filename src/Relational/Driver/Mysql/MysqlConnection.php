@@ -17,24 +17,22 @@ class MysqlConnection implements IConnection
     /**
      * Connect to database described by $dsn
      *
-     * $dsn must be either boolean false to prevent connection
-     * or string containing DSN
-     *
-     * @param mixed $dsn
+     * @param string $dsn a string containing DSN
+     * @param bool $autoConnect
      * @see IConnection::connect() for DSN format
-     * @throws DatasourceException
      */
-    public function __construct($dsn)
+    public function __construct($dsn, $autoConnect = true)
     {
-        if ($dsn !== false) {
-            $this->connect($dsn);
+        $this->dsn = $dsn;
+        if ($autoConnect) {
+            $this->connect();
         }
 
         $this->isTransactionStarted = false;
         $this->listeners = new CompositeTransactionListener();
     }
 
-    public function connect($dsn, $closePrevious = false)
+    public function connect($closePrevious = false)
     {
         if ($this->isConnected()) {
             if ($closePrevious) {
@@ -46,9 +44,7 @@ class MysqlConnection implements IConnection
             }
         }
 
-        $this->dsn = $dsn;
-
-        $p = $this->parseDsn($dsn);
+        $p = $this->parseDsn($this->dsn);
 
         if ($p['persistent']) {
             $this->conn = mysql_pconnect($p['host'], $p['user'], $p['pass']);
@@ -257,9 +253,6 @@ class MysqlConnection implements IConnection
             'charset'    => 'UTF8',
             'persistent' => false,
         );
-
-        $persistent = false;
-        $charset = 'utf8';
 
         $result['host'] = $params['host'];
         if (!empty($params['port'])) {

@@ -1,12 +1,13 @@
 <?php
 namespace Vda\Datasource\KeyValue;
 
+use Vda\Datasource\DatasourceException;
 use Vda\Datasource\UnsupportedOperationException;
 
 class CompositeStorage implements IStorage
 {
     /**
-     *@var array<IStorage>;
+     * @var IStorage[]
      */
     private $backends;
 
@@ -14,7 +15,7 @@ class CompositeStorage implements IStorage
     {
         foreach ($backends as $backend) {
             if (!($backend instanceof IStorage)) {
-                throw new \DatasourceException('All backends must implement IStorage interface');
+                throw new DatasourceException('All backends must implement IStorage interface');
             }
         }
 
@@ -98,6 +99,12 @@ class CompositeStorage implements IStorage
         return false;
     }
 
+    /**
+     * @param $key
+     * @param $val
+     * @param $exp
+     * @param IStorage[] $tried
+     */
     private function popupKey($key, $val, $exp, $tried)
     {
         if ($exp > 0) {

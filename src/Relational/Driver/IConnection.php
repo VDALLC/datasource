@@ -4,19 +4,17 @@ namespace Vda\Datasource\Relational\Driver;
 use Vda\Datasource\DatasourceException;
 use Vda\Transaction\ISavepointCapable;
 
+/**
+ * It is suggested to use DSN in interface implementers __construct(). DSN must be a string in following format:
+ * <pre>
+ * driver://[user[:pass]]@host[:port]/db[?[charset=<charset>][&persistent=<0|1>]]
+ * </pre>
+ * @param string $dsn
+ * @throws DatasourceException
+ */
 interface IConnection extends ISavepointCapable
 {
-    /**
-     * Establish connection to the server described by $dsn
-     *
-     * DSN must be a string in following format:
-     * <pre>
-     * driver://[user[:pass]]@host[:port]/db[?[charset=<charset>][&persistent=<0|1>]]
-     * </pre>
-     * @param string $dsn
-     * @throws DatasourceException
-     */
-    public function connect($dsn);
+    public function connect();
 
     public function disconnect();
 

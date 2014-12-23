@@ -3,10 +3,9 @@ namespace Vda\Datasource\Relational\Driver\Mysqli;
 
 use Vda\Datasource\DatasourceException;
 use Vda\Datasource\Relational\Driver\IConnection;
-use Vda\Datasource\Relational\Resource;
-use Vda\Datasource\Relational\Driver\TransactionInterface;
 use Vda\Transaction\CompositeTransactionListener;
 use Vda\Transaction\ITransactionListener;
+use Vda\Transaction\TransactionException;
 
 class MysqlConnection implements IConnection
 {
@@ -26,21 +25,22 @@ class MysqlConnection implements IConnection
      * $dsn must be either boolean false to prevent connection
      * or string containing DSN
      *
-     * @param mixed $dsn
+     * @param string $dsn
+     * @param bool $autoConnect
      * @see IConnection::connect() for DSN format
-     * @throws DatasourceException
      */
-    public function __construct($dsn)
+    public function __construct($dsn, $autoConnect = true)
     {
-        if ($dsn !== false) {
-            $this->connect($dsn);
-        }
-
+        $this->dsn = $dsn;
         $this->isTransactionStarted = false;
         $this->listeners = new CompositeTransactionListener();
+
+        if ($autoConnect) {
+            $this->connect();
+        }
     }
 
-    public function connect($dsn, $closePrevious = false)
+    public function connect($closePrevious = false)
     {
         if ($this->isConnected()) {
             if ($closePrevious) {
@@ -52,9 +52,7 @@ class MysqlConnection implements IConnection
             }
         }
 
-        $this->dsn = $dsn;
-
-        $p = $this->parseDsn($dsn);
+        $p = $this->parseDsn($this->dsn);
 
         $this->mysql = new \mysqli(
             $p['persistent'] ? 'p:' . $p['host'] : $p['host'],
