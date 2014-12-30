@@ -24,4 +24,21 @@ class MysqlConnectionTestClass extends PHPUnit_Framework_TestCase
 
         $this->assertEquals("'qwe\\'asd'", $dialect->quote('qwe\'asd', Type::STRING));
     }
+
+    public function testMysqlPersistableChange()
+    {
+        $conn = new MysqlConnection('mysql://root@localhost/test?persistent=1');
+
+        ob_start();
+        var_dump($conn);
+        $this->assertRegExp('~resource\(\d+\) of type \(mysql link persistent\)~', ob_get_clean());
+
+        $conn->disconnect();
+        $conn->setPersistable(false);
+        $conn->connect();
+
+        ob_start();
+        var_dump($conn);
+        $this->assertRegExp('~resource\(\d+\) of type \(mysql link\)~', ob_get_clean());
+    }
 }

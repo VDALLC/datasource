@@ -21,6 +21,13 @@ interface IConnection extends ISavepointCapable
     public function isConnected();
 
     /**
+     * Set connection type for next connect()
+     *
+     * @param bool $flag
+     */
+    public function setPersistable($flag);
+
+    /**
      * Execute the SQL query
      *
      * @param string $q Query to execute

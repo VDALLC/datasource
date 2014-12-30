@@ -9,7 +9,7 @@ use Vda\Transaction\TransactionException;
 
 class MysqlConnection implements IConnection
 {
-    private $dsn;
+    private $parsedDsn;
 
     /**
      * @var \mysqli
@@ -31,7 +31,7 @@ class MysqlConnection implements IConnection
      */
     public function __construct($dsn, $autoConnect = true)
     {
-        $this->dsn = $dsn;
+        $this->parsedDsn = $this->parseDsn($dsn);
         $this->isTransactionStarted = false;
         $this->listeners = new CompositeTransactionListener();
 
@@ -52,15 +52,13 @@ class MysqlConnection implements IConnection
             }
         }
 
-        $p = $this->parseDsn($this->dsn);
-
         $this->mysql = new \mysqli(
-            $p['persistent'] ? 'p:' . $p['host'] : $p['host'],
-            $p['user'],
-            $p['pass'],
-            $p['db'],
-            $p['port'],
-            $p['socket']
+            $this->parsedDsn['persistent'] ? 'p:' . $this->parsedDsn['host'] : $this->parsedDsn['host'],
+            $this->parsedDsn['user'],
+            $this->parsedDsn['pass'],
+            $this->parsedDsn['db'],
+            $this->parsedDsn['port'],
+            $this->parsedDsn['socket']
         );
 
         if ($this->mysql->connect_errno) {
@@ -69,7 +67,7 @@ class MysqlConnection implements IConnection
             );
         }
 
-        if (!$this->mysql->set_charset($p['charset'])) {
+        if (!$this->mysql->set_charset($this->parsedDsn['charset'])) {
             $this->disconnect();
             throw new DatasourceException(
                 'Unable to set character set: ' . $this->mysql->error
@@ -297,5 +295,10 @@ class MysqlConnection implements IConnection
         } else {
             throw new DatasourceException('No database connection');
         }
+    }
+
+    public function setPersistable($flag)
+    {
+        $this->parsedDsn['persistent'] = (bool)$flag;
     }
 }

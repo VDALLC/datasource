@@ -9,7 +9,7 @@ use Vda\Transaction\ITransactionListener;
 
 class MysqlConnection implements IConnection
 {
-    private $dsn;
+    private $parsedDsn;
     private $conn;
     private $isTransactionStarted;
     private $listeners;
@@ -23,7 +23,7 @@ class MysqlConnection implements IConnection
      */
     public function __construct($dsn, $autoConnect = true)
     {
-        $this->dsn = $dsn;
+        $this->parsedDsn = $this->parseDsn($dsn);
         if ($autoConnect) {
             $this->connect();
         }
@@ -44,12 +44,10 @@ class MysqlConnection implements IConnection
             }
         }
 
-        $p = $this->parseDsn($this->dsn);
-
-        if ($p['persistent']) {
-            $this->conn = mysql_pconnect($p['host'], $p['user'], $p['pass']);
+        if ($this->parsedDsn['persistent']) {
+            $this->conn = mysql_pconnect($this->parsedDsn['host'], $this->parsedDsn['user'], $this->parsedDsn['pass']);
         } else {
-            $this->conn = mysql_connect($p['host'], $p['user'], $p['pass'], true);
+            $this->conn = mysql_connect($this->parsedDsn['host'], $this->parsedDsn['user'], $this->parsedDsn['pass'], true);
         }
 
         if (empty($this->conn)) {
@@ -58,7 +56,7 @@ class MysqlConnection implements IConnection
             );
         }
 
-        if (!mysql_select_db($p['db'], $this->conn)) {
+        if (!mysql_select_db($this->parsedDsn['db'], $this->conn)) {
             // todo mysql_error($this->conn) not working after $this->disconnect();
             $this->disconnect();
             throw new DatasourceException(
@@ -66,7 +64,7 @@ class MysqlConnection implements IConnection
             );
         }
 
-        if (!mysql_set_charset($p['charset'], $this->conn)) {
+        if (!mysql_set_charset($this->parsedDsn['charset'], $this->conn)) {
             $this->disconnect();
             throw new DatasourceException(
                 'Unable to set character set: ' . mysql_error($this->conn)
@@ -291,5 +289,10 @@ class MysqlConnection implements IConnection
         } else {
             return mysql_escape_string($str);
         }
+    }
+
+    public function setPersistable($flag)
+    {
+        $this->parsedDsn['persistent'] = (bool)$flag;
     }
 }
