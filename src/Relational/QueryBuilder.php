@@ -418,21 +418,6 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
         );
     }
 
-    protected function renderBoolean($value)
-    {
-        return $this->dialect->quote($value, Type::BOOLEAN);
-    }
-
-    protected function renderString($value)
-    {
-        return $this->dialect->quote($value, Type::STRING);
-    }
-
-    protected function renderNumeric($value)
-    {
-        return $this->dialect->quote($value, Type::NUMERIC);
-    }
-
     protected function buildExpressions($expressions, $glue)
     {
         $currentGlue = '';

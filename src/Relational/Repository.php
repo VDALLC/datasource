@@ -11,6 +11,7 @@ use Vda\Query\Update;
 use Vda\Query\Upsert;
 use Vda\Transaction\DecoratingTransactionListener;
 use Vda\Transaction\ITransactionListener;
+use Vda\Util\Type;
 
 class Repository implements ISavepointCapableRepository
 {
@@ -39,7 +40,7 @@ class Repository implements ISavepointCapableRepository
         $rs = $this->conn->query($q);
 
         while ($tuple = $rs->fetchTuple()) {
-            $accumulator->accumulate($tuple);
+            $accumulator->accumulate($this->unmarshall($select->getFields(), $tuple));
 
             if ($accumulator->isFilled()) {
                 break;
@@ -141,5 +142,18 @@ class Repository implements ISavepointCapableRepository
     public function removeTransactionListener(ITransactionListener $listener)
     {
         $this->listener->removeListener($listener);
+    }
+
+    protected function unmarshall(array $fields, array $tuple)
+    {
+        $num = count($fields);
+
+        for ($i = 0; $i < $num; $i++) {
+            if ($fields[$i]->getType() == Type::DATE && !is_null($tuple[$i])) {
+                $tuple[$i] = new \DateTime($tuple[$i]);
+            }
+        }
+
+        return $tuple;
     }
 }
