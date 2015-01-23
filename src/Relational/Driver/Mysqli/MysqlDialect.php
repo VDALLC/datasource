@@ -35,19 +35,22 @@ class MysqlDialect implements ISqlDialect
         }
 
         if ($type == Type::DATE) {
+            $timestamp = false;
             if ($literal instanceof \DateTimeInterface) {
-                return $literal->format("'Y-m-d H:i:s'");
-            } else {
+                $timestamp = $literal->getTimestamp();
+            } elseif (is_array($literal) && !empty($literal['timestamp'])) {
+                $timestamp = $literal['timestamp'];
+            } elseif (is_string($literal)) {
                 $timestamp = strtotime($literal);
-
-                if ($timestamp === false) {
-                    throw new \InvalidArgumentException(
-                        "The '{$literal}' literal must be valid date"
-                    );
-                }
-
-                return date("'Y-m-d H:i:s'", $timestamp);
             }
+
+            if ($timestamp === false) {
+                throw new \InvalidArgumentException(
+                    "The '{$literal}' literal must be valid date"
+                );
+            }
+
+            return date("'Y-m-d H:i:s'", $timestamp);
         }
 
         if ($type == Type::STRING) {
