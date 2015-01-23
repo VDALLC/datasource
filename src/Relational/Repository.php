@@ -149,7 +149,11 @@ class Repository implements ISavepointCapableRepository
         $num = count($fields);
 
         for ($i = 0; $i < $num; $i++) {
-            if ($fields[$i]->getType() == Type::DATE && !is_null($tuple[$i])) {
+            if (
+                $fields[$i] instanceof Field &&
+                $fields[$i]->getType() == Type::DATE &&
+                !is_null($tuple[$i])
+            ) {
                 $tuple[$i] = new \DateTime($tuple[$i]);
             }
         }
