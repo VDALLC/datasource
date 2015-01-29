@@ -5,6 +5,7 @@ use Psr\Log\LoggerInterface;
 use Vda\Datasource\ISavepointCapableRepository;
 use Vda\Datasource\Relational\Driver\IConnection;
 use Vda\Query\Delete;
+use Vda\Query\Field;
 use Vda\Query\Insert;
 use Vda\Query\Select;
 use Vda\Query\Update;
