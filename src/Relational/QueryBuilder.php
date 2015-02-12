@@ -138,7 +138,13 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
             $insert->getSelect()->onProcess($this);
         } else {
             $this->query .= ' VALUES (';
-            $this->buildExpressions($insert->getValues(), ', ');
+            $valuesSeries = $insert->getValues();
+            for ($i = 0; $i < count($valuesSeries); $i++) {
+                $this->buildExpressions($valuesSeries[$i], ', ');
+                if ($i < count($valuesSeries) - 1) {
+                    $this->query .= '), (';
+                }
+            }
             $this->query .= ') ';
         }
 
