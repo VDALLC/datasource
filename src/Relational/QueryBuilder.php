@@ -138,7 +138,12 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
             $insert->getSelect()->onProcess($this);
         } else {
             $this->query .= ' VALUES (';
-            $this->buildExpressions($insert->getValues(), ', ');
+            $currentGlue = '';
+            foreach ($insert->getValues() as $values) {
+                $this->query .= $currentGlue;
+                $this->buildExpressions($values, ', ');
+                $currentGlue = '), (';
+            }
             $this->query .= ') ';
         }
 
