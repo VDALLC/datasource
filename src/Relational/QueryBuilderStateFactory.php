@@ -10,6 +10,7 @@ class QueryBuilderStateFactory
     protected $upsertState;
     protected $deleteState;
     protected $groupOrderState;
+    protected $matchOperatorState;
 
     public function __construct()
     {
@@ -103,5 +104,18 @@ class QueryBuilderStateFactory
         }
 
         return $this->groupOrderState;
+    }
+
+    /**
+     * @return QueryBuilderState
+     */
+    public function matchOperator()
+    {
+        if (empty($this->matchOperatorState)) {
+            $this->matchOperatorState = new QueryBuilderState();
+            $this->matchOperatorState->setWildcardsQuoted(true);
+        }
+
+        return $this->matchOperatorState;
     }
 }

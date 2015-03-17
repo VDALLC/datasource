@@ -296,6 +296,13 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
 
     public function processBinaryOperator(BinaryOperator $op)
     {
+        $matchOperators = array(
+            Operator::MNEMONIC_BINARY_MATCH,
+            Operator::MNEMONIC_BINARY_MATCHI,
+            Operator::MNEMONIC_BINARY_NOTMATCH,
+            Operator::MNEMONIC_BINARY_NOTMATCHI
+        );
+
         $opcodes = array(
             Operator::MNEMONIC_BINARY_MINUS     => '-',
             Operator::MNEMONIC_BINARY_DIVIDE    => '/',
@@ -319,7 +326,14 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
 
         $op->getOperand1()->onProcess($this);
         $this->query .= $opcodes[$op->getMnemonic()];
-        $op->getOperand2()->onProcess($this);
+
+        if (in_array($op->getMnemonic(), $matchOperators)) {
+            $this->enterState($this->stateFactory->matchOperator());
+            $op->getOperand2()->onProcess($this);
+            $this->leaveState();
+        } else {
+            $op->getOperand2()->onProcess($this);
+        }
     }
 
     public function processFunctionCall(FunctionCall $func)
@@ -389,10 +403,11 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
             $this->onInvalidMnemonic('mask', $mask->getMnemonic());
         }
 
-        $this->query .= $this->dialect->quote(
-            strtr($mask->getMask(), self::$patternSubstitute),
-            Type::STRING
+        $value = $this->dialect->quoteWildcards(
+            $this->dialect->quote($mask->getMask(), Type::STRING)
         );
+
+        $this->query .= strtr($value, self::$patternSubstitute);
     }
 
     public function processAlias(Alias $alias)
@@ -501,7 +516,14 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
             if ($type == Type::AUTO) {
                 $type = Type::resolveType($value);
             }
-            $this->query .= $this->dialect->quote($value, $type);
+
+            $value = $this->dialect->quote($value, $type);
+
+            if ($this->currentState->isWildcardsQuoted()) {
+                $value = $this->dialect->quoteWildcards($value);
+            }
+
+            $this->query .= $value;
         }
     }
 
