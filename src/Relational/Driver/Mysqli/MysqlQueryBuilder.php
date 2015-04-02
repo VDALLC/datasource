@@ -5,6 +5,7 @@ use Vda\Datasource\Relational\QueryBuilder;
 use Vda\Datasource\Relational\QueryBuilderState;
 use Vda\Query\Upsert;
 use Vda\Query\Operator\Operator;
+use Vda\Util\Type;
 
 class MysqlQueryBuilder extends QueryBuilder
 {
@@ -38,7 +39,7 @@ class MysqlQueryBuilder extends QueryBuilder
 
         if (!empty($t->_primaryKey) && count($keyFields) == 1) {
             $pk = $t->getField(reset($keyFields));
-            if (!in_array($pk, $updateFields)) {
+            if ($pk->getType() == Type::INTEGER && !in_array($pk, $updateFields)) {
                 $updateFields[] = $pk;
                 $updateValues[] = Operator::call('LAST_INSERT_ID', array($pk));
             }
