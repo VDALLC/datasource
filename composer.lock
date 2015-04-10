@@ -4,26 +4,25 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4a891958cc4373b0d01c381629578338",
+    "hash": "82535ff115739e4b95e3a97b933b4cae",
     "packages": [
         {
             "name": "vda/query",
-            "version": "0.11.2",
-            "target-dir": "Vda/Query",
+            "version": "0.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/VDALLC/query.git",
-                "reference": "c4a927d7d4cecb3461076475098fea3bac185923"
+                "reference": "d7879ec6f8b9ccce1c904ef257975a1017f3560d"
             },
             "dist": {
                 "type": "zip",
-                "url": "http://composer.vda-team.com/dist/vda-query-0.11.2-ebb166.zip",
-                "reference": "c4a927d7d4cecb3461076475098fea3bac185923",
-                "shasum": "1fd8a70ac547602f896b44721f45899ce614aea2"
+                "url": "http://composer.vda-team.com/dist/vda-query-0.14.0-610d3a.zip",
+                "reference": "d7879ec6f8b9ccce1c904ef257975a1017f3560d",
+                "shasum": "1038c36e9f0603b6048112ac89154ee74813e683"
             },
             "require": {
                 "php": ">=5.3.23",
-                "vda/util": "0.11.*"
+                "vda/util": "0.12.*"
             },
             "type": "library",
             "extra": {
@@ -32,8 +31,8 @@
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "": ""
+                "psr-4": {
+                    "Vda\\Query\\": "src/"
                 }
             },
             "description": "Abstract queries",
@@ -41,7 +40,7 @@
                 "criterion",
                 "query"
             ],
-            "time": "2014-05-05 07:09:37"
+            "time": "2015-04-10 07:52:22"
         },
         {
             "name": "vda/transaction",
@@ -74,18 +73,17 @@
         },
         {
             "name": "vda/util",
-            "version": "0.11.0",
-            "target-dir": "Vda/Util",
+            "version": "0.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/VDALLC/util.git",
-                "reference": "9a2538bd17e5a09b6abdaa28732d0bff03f7a5f2"
+                "reference": "f53592d83daca38a377c2309dda6c504a41afb1a"
             },
             "dist": {
                 "type": "zip",
-                "url": "http://composer.vda-team.com/dist/vda-util-0.11.0-28b762.zip",
-                "reference": "9a2538bd17e5a09b6abdaa28732d0bff03f7a5f2",
-                "shasum": "eb385b5ef8d6082792a80cdb027ca58e96b73c50"
+                "url": "http://composer.vda-team.com/dist/vda-util-0.12.0-4a98d9.zip",
+                "reference": "f53592d83daca38a377c2309dda6c504a41afb1a",
+                "shasum": "618d4a1511fef9d3bd39733e46d4efc29bd44c33"
             },
             "require": {
                 "php": ">=5.3.23"
@@ -97,15 +95,15 @@
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "": ""
+                "psr-4": {
+                    "Vda\\Util\\": "src/"
                 }
             },
             "description": "Some usefull utils",
             "keywords": [
                 "util"
             ],
-            "time": "2014-04-21 09:35:41"
+            "time": "2015-01-22 08:47:44"
         }
     ],
     "packages-dev": [
@@ -115,12 +113,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "5bee6fe56c2e8d1fc22b5188d49b6a2500df065f"
+                "reference": "a54d460500aeaf653cabc1059cc33d07e7b544ad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/5bee6fe56c2e8d1fc22b5188d49b6a2500df065f",
-                "reference": "5bee6fe56c2e8d1fc22b5188d49b6a2500df065f",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/a54d460500aeaf653cabc1059cc33d07e7b544ad",
+                "reference": "a54d460500aeaf653cabc1059cc33d07e7b544ad",
                 "shasum": ""
             },
             "require": {
@@ -134,9 +132,10 @@
                 "aws/aws-sdk-php": "~2.4, >2.4.8",
                 "doctrine/couchdb": "~1.0@dev",
                 "graylog2/gelf-php": "~1.0",
-                "phpunit/phpunit": "~3.7.0",
+                "phpunit/phpunit": "~4.0",
                 "raven/raven": "~0.5",
                 "ruflin/elastica": "0.90.*",
+                "swiftmailer/swiftmailer": "~5.3",
                 "videlalvaro/php-amqplib": "~2.4"
             },
             "suggest": {
@@ -153,7 +152,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.11.x-dev"
+                    "dev-master": "1.13.x-dev"
                 }
             },
             "autoload": {
@@ -179,7 +178,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2014-12-17 10:47:08"
+            "time": "2015-04-04 10:50:52"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -244,31 +243,33 @@
         },
         {
             "name": "phpunit/php-file-iterator",
-            "version": "1.3.4",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-file-iterator.git",
-                "reference": "acd690379117b042d1c8af1fafd61bde001bf6bb"
+                "reference": "a923bb15680d0089e2316f7a4af8f437046e96bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-file-iterator/zipball/acd690379117b042d1c8af1fafd61bde001bf6bb",
-                "reference": "acd690379117b042d1c8af1fafd61bde001bf6bb",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-file-iterator/zipball/a923bb15680d0089e2316f7a4af8f437046e96bb",
+                "reference": "a923bb15680d0089e2316f7a4af8f437046e96bb",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4.x-dev"
+                }
+            },
             "autoload": {
                 "classmap": [
-                    "File/"
+                    "src/"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
-            "include-path": [
-                ""
-            ],
             "license": [
                 "BSD-3-Clause"
             ],
@@ -285,7 +286,7 @@
                 "filesystem",
                 "iterator"
             ],
-            "time": "2013-10-10 15:34:57"
+            "time": "2015-04-02 05:19:05"
         },
         {
             "name": "phpunit/php-text-template",
@@ -561,12 +562,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "a78d6504ff5d4367497785ab2ade91db3a9fbe11"
+                "reference": "bf2c13de4300e227d7b2fd08027673a79c519987"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/a78d6504ff5d4367497785ab2ade91db3a9fbe11",
-                "reference": "a78d6504ff5d4367497785ab2ade91db3a9fbe11",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/bf2c13de4300e227d7b2fd08027673a79c519987",
+                "reference": "bf2c13de4300e227d7b2fd08027673a79c519987",
                 "shasum": ""
             },
             "type": "library",
@@ -576,8 +577,8 @@
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "Psr\\Log\\": ""
+                "psr-4": {
+                    "Psr\\Log\\": "Psr/Log/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -596,7 +597,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2014-01-18 15:33:09"
+            "time": "2015-03-26 14:39:45"
         },
         {
             "name": "symfony/yaml",
@@ -605,16 +606,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml.git",
-                "reference": "b9c19ce1bd9a51d3f42665973088f2e2b82db240"
+                "reference": "57102e5bcf0e8433549bb339443244e90d70a744"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/b9c19ce1bd9a51d3f42665973088f2e2b82db240",
-                "reference": "b9c19ce1bd9a51d3f42665973088f2e2b82db240",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/57102e5bcf0e8433549bb339443244e90d70a744",
+                "reference": "57102e5bcf0e8433549bb339443244e90d70a744",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": ">=5.3.9"
+            },
+            "require-dev": {
+                "symfony/phpunit-bridge": "~2.7|~3.0.0"
             },
             "type": "library",
             "extra": {
@@ -643,13 +647,14 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
-            "time": "2014-12-09 17:32:32"
+            "time": "2015-04-10 07:19:44"
         }
     ],
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": [],
     "prefer-stable": false,
+    "prefer-lowest": false,
     "platform": {
         "php": ">=5.3.23"
     },

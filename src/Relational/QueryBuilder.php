@@ -108,6 +108,7 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
         $this->leaveState();
 
         $this->buildLimits($select->getLimit(), $select->getOffset());
+        $this->buildLockMode($select->getLockMode());
 
         $this->leaveState();
 
@@ -505,6 +506,22 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
     {
         if ($limit !== null) {
             $this->query .= ' ' . $this->dialect->limitClause($limit, $offset);
+        }
+    }
+
+    protected function buildLockMode($mode)
+    {
+        switch ($mode) {
+            case Select::LOCK_NONE:
+                break;
+            case Select::LOCK_FOR_UPDATE:
+                $this->query .= ' FOR UPDATE';
+                break;
+            case Select::LOCK_FOR_SHARE:
+                $this->query .= ' FOR SHARE';
+                break;
+            default:
+                throw new \RuntimeException("Invalid lock mode #{$mode}");
         }
     }
 

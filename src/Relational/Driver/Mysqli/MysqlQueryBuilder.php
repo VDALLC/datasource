@@ -2,7 +2,7 @@
 namespace Vda\Datasource\Relational\Driver\Mysqli;
 
 use Vda\Datasource\Relational\QueryBuilder;
-use Vda\Datasource\Relational\QueryBuilderState;
+use Vda\Query\Select;
 use Vda\Query\Upsert;
 use Vda\Query\Operator\Operator;
 use Vda\Util\Type;
@@ -48,5 +48,21 @@ class MysqlQueryBuilder extends QueryBuilder
         $this->buildUpdateList($updateFields, $updateValues);
 
         $this->leaveState();
+    }
+
+    protected function buildLockMode($mode)
+    {
+        switch ($mode) {
+            case Select::LOCK_NONE:
+                break;
+            case Select::LOCK_FOR_UPDATE:
+                $this->query .= ' FOR UPDATE';
+                break;
+            case Select::LOCK_FOR_SHARE:
+                $this->query .= ' LOCK IN SHARE MODE';
+                break;
+            default:
+                throw new \RuntimeException("Invalid lock mode #{$mode}");
+        }
     }
 }
