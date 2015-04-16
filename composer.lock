@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "82535ff115739e4b95e3a97b933b4cae",
+    "hash": "e897d7c855caced0cda5d3c58dcc7879",
     "packages": [
         {
             "name": "vda/query",
@@ -44,17 +44,17 @@
         },
         {
             "name": "vda/transaction",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/VDALLC/transaction.git",
-                "reference": "55b6145625628a22a8ee17f6993766061963889c"
+                "reference": "e1fc27bfade2c0d37d3a68d6abc84d13d312ae0f"
             },
             "dist": {
                 "type": "zip",
-                "url": "http://composer.vda-team.com/dist/vda-transaction-0.1.0-c2ae5e.zip",
-                "reference": "55b6145625628a22a8ee17f6993766061963889c",
-                "shasum": "950232de8fc998e46150cb6e9205570bcb3f0adb"
+                "url": "http://composer.vda-team.com/dist/vda-transaction-0.2.0-c5a817.zip",
+                "reference": "e1fc27bfade2c0d37d3a68d6abc84d13d312ae0f",
+                "shasum": "9f7e820f0ef89b10650569f331dfea5d39639d0c"
             },
             "require": {
                 "php": ">=5.3.23"
@@ -69,7 +69,7 @@
             "keywords": [
                 "transaction"
             ],
-            "time": "2014-10-06 09:41:17"
+            "time": "2015-04-16 08:46:53"
         },
         {
             "name": "vda/util",
@@ -113,12 +113,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "a54d460500aeaf653cabc1059cc33d07e7b544ad"
+                "reference": "03fc68ca1419c7e16050e96c15c7f7e1f2fc26ff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/a54d460500aeaf653cabc1059cc33d07e7b544ad",
-                "reference": "a54d460500aeaf653cabc1059cc33d07e7b544ad",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/03fc68ca1419c7e16050e96c15c7f7e1f2fc26ff",
+                "reference": "03fc68ca1419c7e16050e96c15c7f7e1f2fc26ff",
                 "shasum": ""
             },
             "require": {
@@ -178,7 +178,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2015-04-04 10:50:52"
+            "time": "2015-04-15 18:23:25"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -601,17 +601,17 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "2.7.x-dev",
+            "version": "2.8.x-dev",
             "target-dir": "Symfony/Component/Yaml",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml.git",
-                "reference": "57102e5bcf0e8433549bb339443244e90d70a744"
+                "reference": "fdded56dde4ca9efce6322887bf5eaa7bb0aae3e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/57102e5bcf0e8433549bb339443244e90d70a744",
-                "reference": "57102e5bcf0e8433549bb339443244e90d70a744",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/fdded56dde4ca9efce6322887bf5eaa7bb0aae3e",
+                "reference": "fdded56dde4ca9efce6322887bf5eaa7bb0aae3e",
                 "shasum": ""
             },
             "require": {
@@ -623,7 +623,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.7-dev"
+                    "dev-master": "2.8-dev"
                 }
             },
             "autoload": {
@@ -647,7 +647,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
-            "time": "2015-04-10 07:19:44"
+            "time": "2015-04-10 08:56:33"
         }
     ],
     "aliases": [],
