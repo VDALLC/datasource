@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": ">=5.3.23",
-        "vda/query": "0.14.*",
+        "vda/query": "0.15.*",
         "vda/transaction": "0.2.*",
         "vda/util": "0.12.*"
     },

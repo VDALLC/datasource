@@ -240,6 +240,11 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
     {
         $this->query .= $this->currentSourceGlue;
 
+        $schema = $table->getSchema();
+        if (!empty($schema)) {
+            $this->query .= $this->dialect->quoteIdentifier($schema) . '.';
+        }
+
         $this->query .= $this->dialect->quoteIdentifier($table->getName());
 
         if (!$this->currentState->isAliasIgnored()) {
@@ -378,7 +383,6 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
             return;
         }
 
-        $type = $const->getType();
         $isArray = ($const->getType() & Type::COLLECTION) > 0;
         $type = $const->getType() & ~Type::COLLECTION;
 
