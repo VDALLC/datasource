@@ -1,6 +1,7 @@
 <?php
 namespace Vda\Datasource\Relational\Driver\Mysql;
 
+use Exception;
 use Vda\Datasource\DatasourceException;
 use Vda\Datasource\Relational\Driver\IConnection;
 use Vda\Datasource\Relational\Driver\Mysqli\MysqlDialect;
@@ -222,6 +223,21 @@ class MysqlConnection implements IConnection
             $this->listeners->onSavepointRollback($this, $savepoint);
         } catch (DatasourceException $e) {
             throw new TransactionException('Unable to rollback to savepoint', 0, $e);
+        }
+    }
+
+    public function transaction($callback)
+    {
+        try {
+            $this->begin();
+            $res = $callback();
+            $this->commit();
+            return $res;
+        } catch (Exception $ex) {
+            if ($this->isTransactionStarted()) {
+                $this->rollback();
+            }
+            throw $ex;
         }
     }
 

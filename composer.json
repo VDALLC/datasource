@@ -11,8 +11,8 @@
     ],
     "require": {
         "php": ">=5.3.23",
-        "vda/query": "0.13.*",
-        "vda/transaction": "0.1.*",
+        "vda/query": "0.15.*",
+        "vda/transaction": "0.2.*",
         "vda/util": "0.12.*"
     },
     "require-dev": {
@@ -20,7 +20,9 @@
         "monolog/monolog": "*"
     },
     "autoload": {
-        "psr-4": { "Vda\\Datasource\\": "src/" }
+        "psr-4": {
+            "Vda\\Datasource\\": "src/"
+        }
     },
     "minimum-stability": "dev"
 }

@@ -72,6 +72,11 @@ class MysqlDialect implements ISqlDialect
         return $scope . $this->escapeString($identifier, '`');
     }
 
+    public function quoteWildcards($literal)
+    {
+        return addcslashes($literal, '%_');
+    }
+
     public function patternMatchOperator($isCaseSensitive, $isNegative)
     {
         $modifier = $isCaseSensitive ? ' BINARY ' : ' ';
