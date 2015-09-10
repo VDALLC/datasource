@@ -57,4 +57,28 @@ class MysqliConnectionTestClass extends PHPUnit_Framework_TestCase
 
         $this->assertNotEquals($first, $second);
     }
+
+    public function testTransaction()
+    {
+        $conn = new MysqlConnection('mysql://root@localhost/test');
+        $this->assertFalse($conn->isTransactionStarted());
+        $res = $conn->transaction(function() use ($conn) {
+            $this->assertTrue($conn->isTransactionStarted());
+            return 25;
+        });
+        $this->assertEquals(25, $res);
+        $this->assertFalse($conn->isTransactionStarted());
+    }
+
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage qwe
+     */
+    public function testTransactionException()
+    {
+        $conn = new MysqlConnection('mysql://root@localhost/test');
+        $conn->transaction(function() {
+            throw new Exception('qwe');
+        });
+    }
 }

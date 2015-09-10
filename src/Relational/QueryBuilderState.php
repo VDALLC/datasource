@@ -8,6 +8,7 @@ class QueryBuilderState
     private $ignoreAlias           = false;
     private $preferAlias           = false;
     private $parenthesizeSubSelect = true;
+    private $quoteWildcards        = false;
 
     public function isRoot()
     {
@@ -57,5 +58,15 @@ class QueryBuilderState
     public function setSelectParenthesized($parenthesizeSubSelect)
     {
         $this->parenthesizeSubSelect = $parenthesizeSubSelect;
+    }
+
+    public function isWildcardsQuoted()
+    {
+        return $this->quoteWildcards;
+    }
+
+    public function setWildcardsQuoted($quoteWildcards)
+    {
+        $this->quoteWildcards = $quoteWildcards;
     }
 }

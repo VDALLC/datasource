@@ -4,6 +4,18 @@ use Vda\Util\Type;
 
 class MysqlConnectionTestClass extends PHPUnit_Framework_TestCase
 {
+    private static $errorLevel = 0;
+
+    public static function setUpBeforeClass()
+    {
+        self::$errorLevel = error_reporting(error_reporting() & ~E_DEPRECATED);
+    }
+
+    public static function tearDownAfterClass()
+    {
+        error_reporting(self::$errorLevel);
+    }
+
     public function testMysql()
     {
         $conn = new MysqlConnection('mysql://root@localhost/test');
@@ -40,5 +52,29 @@ class MysqlConnectionTestClass extends PHPUnit_Framework_TestCase
         ob_start();
         var_dump($conn);
         $this->assertRegExp('~resource\(\d+\) of type \(mysql link\)~', ob_get_clean());
+    }
+
+    public function testTransaction()
+    {
+        $conn = new MysqlConnection('mysql://root@localhost/test');
+        $this->assertFalse($conn->isTransactionStarted());
+        $res = $conn->transaction(function() use ($conn) {
+            $this->assertTrue($conn->isTransactionStarted());
+            return 25;
+        });
+        $this->assertEquals(25, $res);
+        $this->assertFalse($conn->isTransactionStarted());
+    }
+
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage qwe
+     */
+    public function testTransactionException()
+    {
+        $conn = new MysqlConnection('mysql://root@localhost/test');
+        $conn->transaction(function() {
+            throw new Exception('qwe');
+        });
     }
 }

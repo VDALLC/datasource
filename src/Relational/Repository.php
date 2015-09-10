@@ -130,6 +130,11 @@ class Repository implements ISavepointCapableRepository
         $this->conn->rollback();
     }
 
+    public function transaction($callback)
+    {
+        return $this->conn->transaction($callback);
+    }
+
     public function isTransactionStarted()
     {
         return $this->conn->isTransactionStarted();
