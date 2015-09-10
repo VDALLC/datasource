@@ -86,4 +86,45 @@ class MysqlQueryBuilderSelectTestClass extends PHPUnit_Framework_TestCase
             $this->queryBuilder->build($query)
         );
     }
+
+    /**
+     * @param string $input
+     * @param string $expected
+     * @dataProvider selectFromTableWhereLikeDataProvider
+     */
+    public function testSelectFromTableWhereLike($input, $expected)
+    {
+        $query = Select::select()
+            ->from($this->dTest)
+            ->where($this->dTest->value->like($input));
+
+        $this->assertEquals(
+            "SELECT `test`.`id`, `test`.`value` FROM `test` AS `test` WHERE `test`.`value` LIKE BINARY '{$expected}'",
+            $this->queryBuilder->build($query)
+        );
+    }
+
+    public function selectFromTableWhereLikeDataProvider() {
+        return [
+            ['*', '%'],
+            ['?', '_'],
+            ['%', '\\%'],
+            ['_', '\\_'],
+            ['\\?', '?'],
+            ['\\*', '*'],
+            ['\\\\', '\\\\'],
+            ['foo bar', 'foo bar'],
+            ['foo*', 'foo%'],
+            ['foo*bar', 'foo%bar'],
+            ['*foo', '%foo'],
+            ['*foo*', '%foo%'],
+            ['foo?', 'foo_'],
+            ['foo?bar', 'foo_bar'],
+            ['?foo', '_foo'],
+            ['?foo?', '_foo_'],
+            ['foo???', 'foo___'],
+            ['\\\\\\*\\?%_', '\\\\*?\\%\\_'],
+            ['_?foo\\?\\*\\\\bar*%', '\\__foo?*\\\\bar%\\%'],
+        ];
+    }
 }
