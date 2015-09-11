@@ -28,9 +28,9 @@ use Vda\Query\Upsert;
 class QueryBuilder implements IQueryBuilder, IQueryProcessor
 {
     protected static $patternSubstitute = array(
-        '\\\\' => '\\',
-        '\\?' => '?',
-        '\\*' => '*',
+        '\\\\\\\\' => '\\\\',
+        '\\\\?' => '?',
+        '\\\\*' => '*',
         '?' => '_',
         '*' => '%'
     );
