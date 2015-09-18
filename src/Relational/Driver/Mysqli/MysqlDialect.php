@@ -38,7 +38,7 @@ class MysqlDialect implements ISqlDialect
             $timestamp = false;
             if ($literal instanceof \DateTimeInterface) {
                 $timestamp = $literal->getTimestamp();
-            } elseif (is_array($literal) && !empty($literal['timestamp'])) {
+            } elseif (is_array($literal) && isset($literal['timestamp'])) {
                 $timestamp = $literal['timestamp'];
             } elseif (is_string($literal)) {
                 $timestamp = strtotime($literal);
