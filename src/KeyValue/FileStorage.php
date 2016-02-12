@@ -47,6 +47,10 @@ class FileStorage implements IStorage
 
     public function delete($key)
     {
+        if ($this->get($key) === false) {
+            return false;
+        }
+
         return $this->updateParam($key, null, -1);
     }
 
@@ -183,7 +187,7 @@ class FileStorage implements IStorage
             return $this->data[$section][$key];
         }
 
-        return null;
+        return false;
     }
 
     private function lock($exclusive)
