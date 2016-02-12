@@ -58,7 +58,8 @@ class FileStorage implements IStorage
 
         if ($this->hasParam($key)) {
             $current = $this->get($key);
-            $expire = $this->getExpirationTime($key) - time();
+            $expire = $this->getExpirationTime($key);
+            $expire = $expire == 0 ? 0 : $expire - time();
             $this->updateParam(
                 $key,
                 is_numeric($current) ? $current + $delta : $delta,
