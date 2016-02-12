@@ -90,6 +90,7 @@ class FileStorage implements IStorage
         $this->loadData();
 
         if ($unique && $expire >= 0 && $this->hasParam($key)) {
+            $this->unlock();
             return false;
         }
 
@@ -192,7 +193,6 @@ class FileStorage implements IStorage
 
         $this->lockCount++;
     }
-
 
     private function unlock()
     {
