@@ -47,6 +47,10 @@ class FileStorage implements IStorage
 
     public function delete($key)
     {
+        if ($this->get($key) === false) {
+            return false;
+        }
+
         return $this->updateParam($key, null, -1);
     }
 
@@ -58,7 +62,8 @@ class FileStorage implements IStorage
 
         if ($this->hasParam($key)) {
             $current = $this->get($key);
-            $expire = $this->getExpirationTime($key) - time();
+            $expire = $this->getExpirationTime($key);
+            $expire = $expire == 0 ? 0 : $expire - time();
             $this->updateParam(
                 $key,
                 is_numeric($current) ? $current + $delta : $delta,
@@ -90,6 +95,7 @@ class FileStorage implements IStorage
         $this->loadData();
 
         if ($unique && $expire >= 0 && $this->hasParam($key)) {
+            $this->unlock();
             return false;
         }
 
@@ -181,7 +187,7 @@ class FileStorage implements IStorage
             return $this->data[$section][$key];
         }
 
-        return null;
+        return false;
     }
 
     private function lock($exclusive)
@@ -192,7 +198,6 @@ class FileStorage implements IStorage
 
         $this->lockCount++;
     }
-
 
     private function unlock()
     {
