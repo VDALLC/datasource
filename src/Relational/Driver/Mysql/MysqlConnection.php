@@ -64,10 +64,10 @@ class MysqlConnection implements IConnection
         }
 
         if (!mysql_select_db($this->parsedDsn['db'], $this->conn)) {
-            // todo mysql_error($this->conn) not working after $this->disconnect();
+            $errorMessage = mysql_error($this->conn);
             $this->disconnect();
             throw new DatasourceException(
-                'DB connection failed: ' . mysql_error($this->conn)
+                'DB connection failed: ' . $errorMessage
             );
         }
 
