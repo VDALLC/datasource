@@ -20,7 +20,7 @@ class DTest extends Table
     }
 }
 
-class MysqlQueryBuilderSelectTestClass extends PHPUnit_Framework_TestCase
+class MysqlQueryBuilderSelectTestClass extends AbstractMysqlTestClass
 {
     /**
      * @var IQueryBuilder
