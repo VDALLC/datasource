@@ -36,7 +36,13 @@ class PeclRedisStorage implements IStorage
 
     public function get($key)
     {
-        return $this->backend->get($key);
+        $value = $this->backend->get($key);
+
+        if ($value === false) {
+            return false;
+        }
+
+        return json_decode($value, true);
     }
 
     public function getExpirationTime($key)
@@ -50,7 +56,7 @@ class PeclRedisStorage implements IStorage
 
     public function add($key, $value, $ttl = 0)
     {
-        $result = $this->backend->setnx($key, $value);
+        $result = $this->backend->setnx($key, json_encode($value));
 
         if ($result === true && $ttl > 0) {
             $this->backend->expire($key, $ttl);
@@ -61,7 +67,7 @@ class PeclRedisStorage implements IStorage
 
     public function set($key, $value, $ttl = 0)
     {
-        return $this->backend->set($key, $value, $ttl);
+        return $this->backend->set($key, json_encode($value), $ttl);
     }
 
     public function delete($key)
