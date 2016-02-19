@@ -2,7 +2,7 @@
 use Vda\Datasource\Relational\Driver\Mysqli\MysqlConnection;
 use Vda\Util\Type;
 
-class MysqliConnectionTestClass extends PHPUnit_Framework_TestCase
+class MysqliConnectionTestClass extends AbstractMysqlTestClass
 {
     public function testMysqli()
     {

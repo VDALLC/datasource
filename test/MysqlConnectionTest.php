@@ -2,13 +2,15 @@
 use Vda\Datasource\Relational\Driver\Mysql\MysqlConnection;
 use Vda\Util\Type;
 
-class MysqlConnectionTestClass extends PHPUnit_Framework_TestCase
+class MysqlConnectionTestClass extends AbstractMysqlTestClass
 {
     private static $errorLevel = 0;
 
     public static function setUpBeforeClass()
     {
         self::$errorLevel = error_reporting(error_reporting() & ~E_DEPRECATED);
+
+        parent::setUpBeforeClass();
     }
 
     public static function tearDownAfterClass()

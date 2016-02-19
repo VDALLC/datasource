@@ -3,7 +3,7 @@
 use Vda\Datasource\Relational\Driver\Mysqli\MysqlConnection;
 use Vda\Datasource\Relational\Repository;
 
-class RepositoryTestClass extends PHPUnit_Framework_TestCase
+class RepositoryTestClass extends AbstractMysqlTestClass
 {
     /**
      * @var Repository
