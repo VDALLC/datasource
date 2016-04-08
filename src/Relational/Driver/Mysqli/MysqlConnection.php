@@ -2,13 +2,14 @@
 namespace Vda\Datasource\Relational\Driver\Mysqli;
 
 use Exception;
+use Psr\Log\LoggerInterface;
 use Vda\Datasource\DatasourceException;
-use Vda\Datasource\Relational\Driver\IConnection;
+use Vda\Datasource\Relational\Driver\BaseConnection;
 use Vda\Transaction\CompositeTransactionListener;
 use Vda\Transaction\ITransactionListener;
 use Vda\Transaction\TransactionException;
 
-class MysqlConnection implements IConnection
+class MysqlConnection extends BaseConnection
 {
     private $parsedDsn;
 
@@ -29,10 +30,13 @@ class MysqlConnection implements IConnection
      *
      * @param string $dsn
      * @param bool $autoConnect
+     * @param LoggerInterface $logger
      * @see IConnection::connect() for DSN format
      */
-    public function __construct($dsn, $autoConnect = true)
+    public function __construct($dsn, $autoConnect = true, LoggerInterface $logger = null)
     {
+        parent::__construct($logger);
+
         $this->parsedDsn = $this->parseDsn($dsn);
         $this->isTransactionStarted = false;
         $this->listeners = new CompositeTransactionListener();
@@ -99,7 +103,7 @@ class MysqlConnection implements IConnection
 
     public function query($q)
     {
-        $rs = $this->mysql->query($q);
+        $rs = $this->queryAndProfile($q);
 
         if (!$rs) {
             throw new DatasourceException($this->mysql->error);
@@ -110,7 +114,7 @@ class MysqlConnection implements IConnection
 
     public function exec($q)
     {
-        if (!$this->mysql->query($q)) {
+        if (!$this->queryAndProfile($q)) {
             throw new DatasourceException($this->mysql->error);
         }
 
@@ -324,5 +328,10 @@ class MysqlConnection implements IConnection
     public function setPersistable($flag)
     {
         $this->parsedDsn['persistent'] = (bool)$flag;
+    }
+
+    protected function doQuery($q)
+    {
+        return $this->mysql->query($q);;
     }
 }
