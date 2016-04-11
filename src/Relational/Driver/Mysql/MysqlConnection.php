@@ -2,8 +2,9 @@
 namespace Vda\Datasource\Relational\Driver\Mysql;
 
 use Exception;
+use Psr\Log\LoggerInterface;
 use Vda\Datasource\DatasourceException;
-use Vda\Datasource\Relational\Driver\IConnection;
+use Vda\Datasource\Relational\Driver\BaseConnection;
 use Vda\Datasource\Relational\Driver\Mysqli\MysqlDialect;
 use Vda\Datasource\Relational\Driver\Mysqli\MysqlQueryBuilder;
 use Vda\Datasource\Relational\Driver\Mysqli\MysqlQueryBuilderStateFactory;
@@ -11,7 +12,7 @@ use Vda\Transaction\CompositeTransactionListener;
 use Vda\Transaction\TransactionException;
 use Vda\Transaction\ITransactionListener;
 
-class MysqlConnection implements IConnection
+class MysqlConnection extends BaseConnection
 {
     private $parsedDsn;
     private $conn;
@@ -24,10 +25,13 @@ class MysqlConnection implements IConnection
      *
      * @param string $dsn a string containing DSN
      * @param bool $autoConnect
+     * @param LoggerInterface $logger
      * @see IConnection::connect() for DSN format
      */
-    public function __construct($dsn, $autoConnect = true)
+    public function __construct($dsn, $autoConnect = true, LoggerInterface $logger = null)
     {
+        parent::__construct($logger);
+
         $this->parsedDsn = $this->parseDsn($dsn);
         if ($autoConnect) {
             $this->connect();
@@ -101,7 +105,7 @@ class MysqlConnection implements IConnection
 
     public function query($q)
     {
-        $rs = mysql_query($q, $this->conn);
+        $rs = $this->queryAndProfile($q);
 
         if (empty($rs)) {
             throw new DatasourceException(mysql_error($this->conn));
@@ -112,7 +116,7 @@ class MysqlConnection implements IConnection
 
     public function exec($q)
     {
-        if (!mysql_query($q, $this->conn)) {
+        if (!$this->queryAndProfile($q)) {
             throw new DatasourceException(mysql_error($this->conn));
         }
 
@@ -321,5 +325,10 @@ class MysqlConnection implements IConnection
     public function setPersistable($flag)
     {
         $this->parsedDsn['persistent'] = (bool)$flag;
+    }
+
+    protected function doQuery($q)
+    {
+        return mysql_query($q, $this->conn);
     }
 }

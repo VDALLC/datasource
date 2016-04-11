@@ -1,7 +1,6 @@
 <?php
 namespace Vda\Datasource\Relational;
 
-use Psr\Log\LoggerInterface;
 use Vda\Datasource\ISavepointCapableRepository;
 use Vda\Datasource\Relational\Driver\IConnection;
 use Vda\Query\Delete;
@@ -18,12 +17,10 @@ class Repository implements ISavepointCapableRepository
 {
     private $conn;
     private $qb;
-    private $logger;
 
-    public function __construct(IConnection $conn, LoggerInterface $logger = null)
+    public function __construct(IConnection $conn)
     {
         $this->conn = $conn;
-        $this->logger = $logger;
         $this->qb = $conn->getQueryBuilder();
         $this->listener = new DecoratingTransactionListener($this);
         $this->conn->addTransactionListener($this->listener);
@@ -35,9 +32,6 @@ class Repository implements ISavepointCapableRepository
         $accumulator->reset($select->getProjection());
 
         $q = $this->qb->build($select);
-        if ($this->logger) {
-            $this->logger->debug($q);
-        }
         $rs = $this->conn->query($q);
 
         while ($tuple = $rs->fetchTuple()) {
@@ -55,20 +49,12 @@ class Repository implements ISavepointCapableRepository
     {
         $q = $this->qb->build($insert);
 
-        if ($this->logger) {
-            $this->logger->debug($q);
-        }
-
         return $this->conn->exec($q);
     }
 
     public function upsert(Upsert $upsert)
     {
         $q = $this->qb->build($upsert);
-
-        if ($this->logger) {
-            $this->logger->debug($q);
-        }
 
         return $this->conn->exec($q);
     }
@@ -77,20 +63,12 @@ class Repository implements ISavepointCapableRepository
     {
         $q = $this->qb->build($update);
 
-        if ($this->logger) {
-            $this->logger->debug($q);
-        }
-
         return $this->conn->exec($q);
     }
 
     public function delete(Delete $delete)
     {
         $q = $this->qb->build($delete);
-
-        if ($this->logger) {
-            $this->logger->debug($q);
-        }
 
         return $this->conn->exec($q);
     }
