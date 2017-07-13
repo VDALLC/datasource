@@ -1,8 +1,6 @@
 <?php
 namespace Vda\Datasource\Relational\Driver;
 
-use Vda\Datasource\DatasourceException;
-use Vda\Datasource\Relational\IQueryBuilder;
 use Vda\Transaction\ISavepointCapable;
 
 /**
@@ -60,7 +58,7 @@ interface IConnection extends ISavepointCapable
     /**
      * Return a query builder specific for this driver
      *
-     * @return IQueryBuilder
+     * @return \Vda\Datasource\Relational\IQueryBuilder
      */
     public function getQueryBuilder();
 }

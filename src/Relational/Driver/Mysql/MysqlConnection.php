@@ -26,7 +26,7 @@ class MysqlConnection extends BaseConnection
      * @param string $dsn a string containing DSN
      * @param bool $autoConnect
      * @param LoggerInterface $logger
-     * @see IConnection::connect() for DSN format
+     * @see \Vda\Datasource\Relational\Driver\IConnection::connect() for DSN format
      */
     public function __construct($dsn, $autoConnect = true, LoggerInterface $logger = null)
     {

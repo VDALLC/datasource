@@ -1,13 +1,13 @@
 <?php
 namespace Vda\Datasource\Relational\Driver\Mysqli;
 
-use Exception;
 use Psr\Log\LoggerInterface;
 use Vda\Datasource\DatasourceException;
 use Vda\Datasource\Relational\Driver\BaseConnection;
 use Vda\Transaction\CompositeTransactionListener;
 use Vda\Transaction\ITransactionListener;
 use Vda\Transaction\TransactionException;
+use Exception;
 
 class MysqlConnection extends BaseConnection
 {
@@ -31,7 +31,7 @@ class MysqlConnection extends BaseConnection
      * @param string $dsn
      * @param bool $autoConnect
      * @param LoggerInterface $logger
-     * @see IConnection::connect() for DSN format
+     * @see \Vda\Datasource\Relational\Driver\IConnection::connect() for DSN format
      */
     public function __construct($dsn, $autoConnect = true, LoggerInterface $logger = null)
     {

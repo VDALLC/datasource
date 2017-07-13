@@ -5,11 +5,16 @@ use Vda\Datasource\Relational\Driver\ISqlDialect;
 use Vda\Query\Alias;
 use Vda\Query\Delete;
 use Vda\Query\Field;
-use Vda\Query\Insert;
 use Vda\Query\IExpression;
 use Vda\Query\IQueryPart;
 use Vda\Query\IQueryProcessor;
+use Vda\Query\Insert;
 use Vda\Query\JoinClause;
+use Vda\Query\Order;
+use Vda\Query\Select;
+use Vda\Query\Table;
+use Vda\Query\Update;
+use Vda\Query\Upsert;
 use Vda\Query\Operator\BinaryOperator;
 use Vda\Query\Operator\CompositeOperator;
 use Vda\Query\Operator\Constant;
@@ -17,13 +22,7 @@ use Vda\Query\Operator\FunctionCall;
 use Vda\Query\Operator\Mask;
 use Vda\Query\Operator\Operator;
 use Vda\Query\Operator\UnaryOperator;
-use Vda\Query\Order;
-use Vda\Query\Select;
-use Vda\Query\Table;
-use Vda\Query\Update;
 use Vda\Util\Type;
-use Vda\Query\Merge;
-use Vda\Query\Upsert;
 
 class QueryBuilder implements IQueryBuilder, IQueryProcessor
 {
@@ -492,7 +491,7 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
 
     protected function buildGroups($groups)
     {
-        if ($groups != null) {
+        if (!empty($groups)) {
             $this->query .= ' GROUP BY ';
             $this->buildExpressions($groups, ', ');
         }
@@ -500,7 +499,7 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
 
     protected function buildOrders($orders)
     {
-        if ($orders != null) {
+        if (!empty($orders)) {
             $this->query .= ' ORDER BY ';
             $this->buildExpressions($orders, ', ');
         }
