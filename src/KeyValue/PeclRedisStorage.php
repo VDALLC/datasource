@@ -67,7 +67,11 @@ class PeclRedisStorage implements IStorage
 
     public function set($key, $value, $ttl = 0)
     {
-        return $this->backend->set($key, json_encode($value), $ttl);
+        if ($ttl > 0) {
+            return $this->backend->set($key, json_encode($value), $ttl);
+        } else {
+            return $this->backend->set($key, json_encode($value));
+        }
     }
 
     public function delete($key)
