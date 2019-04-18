@@ -3,8 +3,8 @@ namespace Vda\Datasource\KeyValue;
 
 class MemoryStorage implements IStorage
 {
-    private $data = array();
-    private $expire = array();
+    private $data = [];
+    private $expire = [];
 
     public function get($key)
     {
@@ -24,7 +24,7 @@ class MemoryStorage implements IStorage
     public function set($key, $value, $ttl = 0)
     {
         $this->data[$key] = $value;
-        $this->expire[$key] = empty($ttl) ? 0 : time() + $ttl;
+        $this->expire[$key] = empty($ttl) ? 0 : \time() + $ttl;
 
         return true;
     }
@@ -58,11 +58,11 @@ class MemoryStorage implements IStorage
 
     private function isExistAndNotExpired($key)
     {
-        if (!array_key_exists($key, $this->data)) {
+        if (!\array_key_exists($key, $this->data)) {
             return false;
         }
 
-        if (!empty($this->expire[$key]) && $this->expire[$key] <= time()) {
+        if (!empty($this->expire[$key]) && $this->expire[$key] <= \time()) {
             $this->remove($key);
             return false;
         }

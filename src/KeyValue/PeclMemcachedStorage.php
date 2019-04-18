@@ -12,7 +12,7 @@ class PeclMemcachedStorage implements IStorage
 
     public function __construct($addr, $persistent_id = null)
     {
-        if (!class_exists('\Memcached')) {
+        if (!\class_exists(\Memcached::class)) {
             throw new DatasourceException(
                 'The \\Memcached class not found. Is pecl-memcached installed?'
             );
@@ -24,14 +24,15 @@ class PeclMemcachedStorage implements IStorage
             $this->backend = new \Memcached();
         }
 
-        if (preg_match('!^(.*)(?:\:(\d+)?)$!', $addr, $parts)) {
+        /** @var array $parts */
+        if (\preg_match('!^(.*)(?:\:(\d+)?)$!', $addr, $parts)) {
             $addr = $parts[1];
             $port = empty($parts[2]) ? 0 : $parts[2];
         } else {
             $port = 0;
         }
 
-        if (!count($this->backend->getServerList())) {
+        if (!\count($this->backend->getServerList())) {
             if (!$this->backend->addServer($addr, $port)) {
                 throw new DatasourceException("Unable to connect to {$addr}");
             }
@@ -51,7 +52,7 @@ class PeclMemcachedStorage implements IStorage
     public function add($key, $value, $ttl = 0)
     {
         if ($ttl > 0) {
-            $ttl += time();
+            $ttl += \time();
         }
 
         if ($this->backend->add('val:' . $key, $value, $ttl)) {
@@ -66,7 +67,7 @@ class PeclMemcachedStorage implements IStorage
     public function set($key, $value, $ttl = 0)
     {
         if ($ttl > 0) {
-            $ttl += time();
+            $ttl += \time();
         }
 
         if ($this->backend->set('val:' . $key, $value, $ttl)) {

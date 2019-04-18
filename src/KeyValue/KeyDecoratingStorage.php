@@ -9,13 +9,8 @@ class KeyDecoratingStorage implements IStorage
     private $backend;
     private $decorator;
 
-    public function __construct($keyDecorator, IStorage $backend)
+    public function __construct(callable $keyDecorator, IStorage $backend)
     {
-        //FIXME Add the callable typehint when we switch to 5.4
-        if (!is_callable($keyDecorator)) {
-            throw new \InvalidArgumentException('Key decorator must be callable');
-        }
-
         $this->backend = $backend;
         $this->decorator = $keyDecorator;
     }
@@ -57,6 +52,8 @@ class KeyDecoratingStorage implements IStorage
 
     private function decorate($str)
     {
-        return call_user_func($this->decorator, $str);
+        $f = $this->decorator;
+
+        return $f($str);
     }
 }

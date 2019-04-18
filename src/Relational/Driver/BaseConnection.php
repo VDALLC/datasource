@@ -32,12 +32,12 @@ abstract class BaseConnection implements IConnection
      */
     protected function queryAndProfile($query)
     {
-        $start = microtime(true);
+        $start = \microtime(true);
 
         $result = $this->doQuery($query);
 
         if ($this->logger) {
-            $duration = number_format(microtime(true) - $start, 5, '.', ' ');
+            $duration = \number_format(microtime(true) - $start, 5, '.', ' ');
             $this->logger->debug("{$query} run {$duration} s");
         }
 

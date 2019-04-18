@@ -3,26 +3,25 @@ namespace Vda\Datasource\KeyValue;
 
 use Vda\Datasource\DatasourceException;
 
-use \Memcache;
-
 class PeclMemcacheStorage implements IStorage
 {
     /**
-     * @var Memcache
+     * @var \Memcache
      */
     private $backend;
 
     public function __construct($addr, $persistent = true)
     {
-        if (!class_exists('\Memcache')) {
+        if (!\class_exists(\Memcache::class)) {
             throw new DatasourceException(
                 'The \\Memcache class not found. Is pecl-memcache installed?'
             );
         }
 
-        $this->backend = new Memcache();
+        $this->backend = new \Memcache();
 
-        if (preg_match('!^(.*)(?:\:(\d+)?)$!', $addr, $parts)) {
+        /** @var array $parts */
+        if (\preg_match('!^(.*)(?:\:(\d+)?)$!', $addr, $parts)) {
             $addr = $parts[1];
             $port = empty($parts[2]) ? 0 : $parts[2];
         } else {
@@ -49,7 +48,7 @@ class PeclMemcacheStorage implements IStorage
     public function add($key, $value, $ttl = 0)
     {
         if ($ttl > 0) {
-            $ttl += time();
+            $ttl += \time();
         }
 
         if ($this->backend->add('val:' . $key, $value, false, $ttl)) {
@@ -64,7 +63,7 @@ class PeclMemcacheStorage implements IStorage
     public function set($key, $value, $ttl = 0)
     {
         if ($ttl > 0) {
-            $ttl += time();
+            $ttl += \time();
         }
 
         if ($this->backend->set('val:' . $key, $value, false, $ttl)) {

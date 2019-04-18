@@ -26,20 +26,20 @@ use Vda\Util\Type;
 
 class QueryBuilder implements IQueryBuilder, IQueryProcessor
 {
-    protected static $patternSubstitute = array(
+    protected static $patternSubstitute = [
         '\\\\\\\\' => '\\\\',
         '\\\\?' => '?',
         '\\\\*' => '*',
         '?' => '_',
         '*' => '%'
-    );
+    ];
 
-    protected static $opcodes = array(
+    protected static $opcodes = [
         Operator::MNEMONIC_COMPOSITE_AND => ' AND ',
         Operator::MNEMONIC_COMPOSITE_OR  => ' OR ',
         Operator::MNEMONIC_COMPOSITE_PLUS => ' + ',
         Operator::MNEMONIC_COMPOSITE_MULTIPLY => ' * '
-    );
+    ];
 
     /**
      * @var ISqlDialect
@@ -77,9 +77,9 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
     public function build(IQueryPart $processable)
     {
         $this->query = '';
-        $this->stateStack = array();
+        $this->stateStack = [];
         $this->currentState = $this->stateFactory->root();
-        $this->sourceGlueStack = array();
+        $this->sourceGlueStack = [];
         $this->currentSourceGlue = '';
 
         $processable->onProcess($this);
@@ -301,14 +301,14 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
 
     public function processBinaryOperator(BinaryOperator $op)
     {
-        $matchOperators = array(
+        $matchOperators = [
             Operator::MNEMONIC_BINARY_MATCH,
             Operator::MNEMONIC_BINARY_MATCHI,
             Operator::MNEMONIC_BINARY_NOTMATCH,
             Operator::MNEMONIC_BINARY_NOTMATCHI
-        );
+        ];
 
-        $opcodes = array(
+        $opcodes = [
             Operator::MNEMONIC_BINARY_MINUS     => '-',
             Operator::MNEMONIC_BINARY_DIVIDE    => '/',
             Operator::MNEMONIC_BINARY_EQ        => '=',
@@ -323,7 +323,7 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
             Operator::MNEMONIC_BINARY_MATCHI    => $this->dialect->patternMatchOperator(false, false),
             Operator::MNEMONIC_BINARY_NOTMATCH  => $this->dialect->patternMatchOperator(true, true),
             Operator::MNEMONIC_BINARY_NOTMATCHI => $this->dialect->patternMatchOperator(false, true),
-        );
+        ];
 
         if (empty($opcodes[$op->getMnemonic()])) {
             $this->onInvalidMnemonic('binary', $op->getMnemonic());
@@ -332,7 +332,7 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
         $op->getOperand1()->onProcess($this);
         $this->query .= $opcodes[$op->getMnemonic()];
 
-        if (in_array($op->getMnemonic(), $matchOperators)) {
+        if (\in_array($op->getMnemonic(), $matchOperators)) {
             $this->enterState($this->stateFactory->matchOperator());
             $op->getOperand2()->onProcess($this);
             $this->leaveState();
@@ -347,7 +347,7 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
         $this->query .= $func->getName() . '(';
         $args = $func->getArgs();
 
-        if (strcasecmp($func->getName(), 'count') == 0 && empty($args)) {
+        if (\strcasecmp($func->getName(), 'count') == 0 && empty($args)) {
             $this->query .= '*';
         } else {
             $this->buildExpressions($args, ', ');
@@ -377,7 +377,7 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
 
         $value = $const->getValue();
 
-        if (is_null($value)) {
+        if ($value === null) {
             $this->query .= 'NULL';
             return;
         }
@@ -411,7 +411,7 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
             $this->dialect->quote($mask->getMask(), Type::STRING)
         );
 
-        $this->query .= strtr($value, self::$patternSubstitute);
+        $this->query .= \strtr($value, self::$patternSubstitute);
     }
 
     public function processAlias(Alias $alias)
@@ -455,7 +455,7 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
     protected function buildSources($prefix, $sources)
     {
         if (!empty($sources)) {
-            array_push($this->sourceGlueStack, $this->currentSourceGlue);
+            \array_push($this->sourceGlueStack, $this->currentSourceGlue);
             $this->currentSourceGlue = '';
 
             $this->query .= $prefix;
@@ -465,7 +465,7 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
                 $this->currentSourceGlue = ', ';
             }
 
-            $this->currentSourceGlue = array_pop($this->sourceGlueStack);
+            $this->currentSourceGlue = \array_pop($this->sourceGlueStack);
         }
     }
 
@@ -549,12 +549,12 @@ class QueryBuilder implements IQueryBuilder, IQueryProcessor
 
     protected function enterState(QueryBuilderState $state)
     {
-        array_push($this->stateStack, $this->currentState);
+        \array_push($this->stateStack, $this->currentState);
         $this->currentState = $state;
     }
 
     protected function leaveState()
     {
-        $this->currentState = array_pop($this->stateStack);
+        $this->currentState = \array_pop($this->stateStack);
     }
 }

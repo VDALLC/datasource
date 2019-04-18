@@ -14,31 +14,31 @@ class MysqlResult implements IResult
 
     public function numRows()
     {
-        return mysql_num_rows($this->rs);
+        return \mysql_num_rows($this->rs);
     }
 
     public function fetch()
     {
-        return mysql_fetch_assoc($this->rs);
+        return \mysql_fetch_assoc($this->rs);
     }
 
     public function fetchTuple()
     {
-        return mysql_fetch_row($this->rs);
+        return \mysql_fetch_row($this->rs);
     }
 
     public function fetchVal($offset = 0)
     {
-        $row = mysql_fetch_row($this->rs);
+        $row = \mysql_fetch_row($this->rs);
 
         return empty($row) ? null : $row[$offset];
     }
 
     public function fetchAll()
     {
-        $result = array();
+        $result = [];
 
-        while ($row = mysql_fetch_assoc($this->rs)) {
+        while ($row = \mysql_fetch_assoc($this->rs)) {
             $result[] = $row;
         }
 

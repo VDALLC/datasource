@@ -7,7 +7,6 @@ use Vda\Datasource\Relational\Driver\BaseConnection;
 use Vda\Transaction\CompositeTransactionListener;
 use Vda\Transaction\ITransactionListener;
 use Vda\Transaction\TransactionException;
-use Exception;
 
 class MysqlConnection extends BaseConnection
 {
@@ -109,7 +108,7 @@ class MysqlConnection extends BaseConnection
             throw new DatasourceException($this->mysql->error);
         }
 
-        return is_object($rs) ? new MysqlResult($rs) : null;
+        return \is_object($rs) ? new MysqlResult($rs) : null;
     }
 
     public function exec($q)
@@ -237,7 +236,7 @@ class MysqlConnection extends BaseConnection
             $res = $callback();
             $this->commit();
             return $res;
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             if ($this->isTransactionStarted()) {
                 $this->rollback();
             }
@@ -262,7 +261,7 @@ class MysqlConnection extends BaseConnection
 
     private function parseDsn($dsn)
     {
-        $params = parse_url($dsn);
+        $params = \parse_url($dsn);
 
         if ($params === false) {
             throw new DatasourceException('Unable to parse DSN');
@@ -274,7 +273,7 @@ class MysqlConnection extends BaseConnection
             );
         }
 
-        $result = array(
+        $result = [
             'host'       => 'localhost',
             'user'       => 'root',
             'pass'       => '',
@@ -283,7 +282,7 @@ class MysqlConnection extends BaseConnection
             'persistent' => false,
             'port'       => null,
             'socket'     => null,
-        );
+        ];
 
         $result['host'] = $params['host'];
 
@@ -300,11 +299,12 @@ class MysqlConnection extends BaseConnection
         }
 
         if (isset($params['path'])) {
-            $result['db'] = ltrim($params['path'], '/');
+            $result['db'] = \ltrim($params['path'], '/');
         }
 
         if (!empty($params['query'])) {
-            parse_str($params['query'], $opt);
+            /** @var array $opt */
+            \parse_str($params['query'], $opt);
 
             $result['persistent'] = !empty($opt['persistent']);
 

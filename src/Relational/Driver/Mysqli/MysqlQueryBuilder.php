@@ -37,11 +37,11 @@ class MysqlQueryBuilder extends QueryBuilder
 
         $keyFields = $t->_primaryKey->getFields();
 
-        if (!empty($t->_primaryKey) && count($keyFields) == 1) {
-            $pk = $t->getField(reset($keyFields));
-            if ($pk->getType() == Type::INTEGER && !in_array($pk, $updateFields)) {
+        if (!empty($t->_primaryKey) && \count($keyFields) == 1) {
+            $pk = $t->getField(\reset($keyFields));
+            if ($pk->getType() == Type::INTEGER && !\in_array($pk, $updateFields)) {
                 $updateFields[] = $pk;
-                $updateValues[] = Operator::call('LAST_INSERT_ID', array($pk));
+                $updateValues[] = Operator::call('LAST_INSERT_ID', [$pk]);
             }
         }
 

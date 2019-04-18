@@ -81,7 +81,7 @@ class CompositeStorage implements IStorage
 
     private function fetch($key, $needExpireTime)
     {
-        $tried = array();
+        $tried = [];
 
         foreach ($this->backends as $b) {
             $val = $b->get($key);
@@ -108,7 +108,7 @@ class CompositeStorage implements IStorage
     private function popupKey($key, $val, $exp, $tried)
     {
         if ($exp > 0) {
-            $exp -= time();
+            $exp -= \time();
         }
 
         foreach ($tried as $t) {

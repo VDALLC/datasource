@@ -130,13 +130,13 @@ class Repository implements ISavepointCapableRepository
 
     protected function unmarshall(array $fields, array $tuple)
     {
-        $num = count($fields);
+        $num = \count($fields);
 
         for ($i = 0; $i < $num; $i++) {
             if (
                 $fields[$i] instanceof Field &&
                 $fields[$i]->getType() == Type::DATE &&
-                !is_null($tuple[$i])
+                $tuple[$i] !== null
             ) {
                 $tuple[$i] = new \DateTime($tuple[$i]);
             }

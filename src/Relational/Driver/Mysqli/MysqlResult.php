@@ -36,7 +36,7 @@ class MysqlResult implements IResult
 
     public function fetchAll()
     {
-        $result = array();
+        $result = [];
 
         while ($row = $this->rs->fetch_assoc()) {
             $result[] = $row;

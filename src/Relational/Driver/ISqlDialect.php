@@ -7,5 +7,5 @@ interface ISqlDialect
     public function quoteIdentifier($identifier);
     public function patternMatchOperator($isCaseSensitive, $isNegative);
     public function quoteWildcards($literal);
-    public function limitClause($limit, $offset = null);
+    public function limitClause(int $limit, int $offset = null);
 }

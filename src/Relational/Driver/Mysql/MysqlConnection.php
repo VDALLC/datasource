@@ -1,7 +1,6 @@
 <?php
 namespace Vda\Datasource\Relational\Driver\Mysql;
 
-use Exception;
 use Psr\Log\LoggerInterface;
 use Vda\Datasource\DatasourceException;
 use Vda\Datasource\Relational\Driver\BaseConnection;
@@ -9,8 +8,8 @@ use Vda\Datasource\Relational\Driver\Mysqli\MysqlDialect;
 use Vda\Datasource\Relational\Driver\Mysqli\MysqlQueryBuilder;
 use Vda\Datasource\Relational\Driver\Mysqli\MysqlQueryBuilderStateFactory;
 use Vda\Transaction\CompositeTransactionListener;
-use Vda\Transaction\TransactionException;
 use Vda\Transaction\ITransactionListener;
+use Vda\Transaction\TransactionException;
 
 class MysqlConnection extends BaseConnection
 {
@@ -56,29 +55,29 @@ class MysqlConnection extends BaseConnection
         }
 
         if ($this->parsedDsn['persistent']) {
-            $this->conn = mysql_pconnect($this->parsedDsn['host'], $this->parsedDsn['user'], $this->parsedDsn['pass']);
+            $this->conn = \mysql_pconnect($this->parsedDsn['host'], $this->parsedDsn['user'], $this->parsedDsn['pass']);
         } else {
-            $this->conn = mysql_connect($this->parsedDsn['host'], $this->parsedDsn['user'], $this->parsedDsn['pass'], true);
+            $this->conn = \mysql_connect($this->parsedDsn['host'], $this->parsedDsn['user'], $this->parsedDsn['pass'], true);
         }
 
         if (empty($this->conn)) {
             throw new DatasourceException(
-                'DB connection failed: ' . mysql_error()
+                'DB connection failed: ' . \mysql_error()
             );
         }
 
-        if (!mysql_select_db($this->parsedDsn['db'], $this->conn)) {
-            $errorMessage = mysql_error($this->conn);
+        if (!\mysql_select_db($this->parsedDsn['db'], $this->conn)) {
+            $errorMessage = \mysql_error($this->conn);
             $this->disconnect();
             throw new DatasourceException(
                 'DB connection failed: ' . $errorMessage
             );
         }
 
-        if (!mysql_set_charset($this->parsedDsn['charset'], $this->conn)) {
+        if (!\mysql_set_charset($this->parsedDsn['charset'], $this->conn)) {
             $this->disconnect();
             throw new DatasourceException(
-                'Unable to set character set: ' . mysql_error($this->conn)
+                'Unable to set character set: ' . \mysql_error($this->conn)
             );
         }
     }
@@ -86,7 +85,7 @@ class MysqlConnection extends BaseConnection
     public function disconnect()
     {
         if ($this->isConnected()) {
-            mysql_close($this->conn);
+            \mysql_close($this->conn);
         }
 
         $this->conn = null;
@@ -108,16 +107,16 @@ class MysqlConnection extends BaseConnection
         $rs = $this->queryAndProfile($q);
 
         if (empty($rs)) {
-            throw new DatasourceException(mysql_error($this->conn));
+            throw new DatasourceException(\mysql_error($this->conn));
         }
 
-        return is_resource($rs) ? new MysqlResult($rs) : null;
+        return \is_resource($rs) ? new MysqlResult($rs) : null;
     }
 
     public function exec($q)
     {
         if (!$this->queryAndProfile($q)) {
-            throw new DatasourceException(mysql_error($this->conn));
+            throw new DatasourceException(\mysql_error($this->conn));
         }
 
         return $this->affectedRows();
@@ -125,12 +124,12 @@ class MysqlConnection extends BaseConnection
 
     public function affectedRows()
     {
-        return mysql_affected_rows($this->conn);
+        return \mysql_affected_rows($this->conn);
     }
 
     public function lastInsertId()
     {
-        return mysql_insert_id($this->conn);
+        return \mysql_insert_id($this->conn);
     }
 
     public function getDialect()
@@ -237,7 +236,7 @@ class MysqlConnection extends BaseConnection
             $res = $callback();
             $this->commit();
             return $res;
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             if ($this->isTransactionStarted()) {
                 $this->rollback();
             }
@@ -262,7 +261,7 @@ class MysqlConnection extends BaseConnection
 
     private function parseDsn($dsn)
     {
-        $params = parse_url($dsn);
+        $params = \parse_url($dsn);
 
         if ($params === false) {
             throw new DatasourceException('Unable to parse DSN');
@@ -274,14 +273,14 @@ class MysqlConnection extends BaseConnection
             );
         }
 
-        $result = array(
+        $result = [
             'host'       => 'localhost',
             'user'       => 'root',
             'pass'       => '',
             'db'         => null,
             'charset'    => 'UTF8',
             'persistent' => false,
-        );
+        ];
 
         $result['host'] = $params['host'];
         if (!empty($params['port'])) {
@@ -297,11 +296,12 @@ class MysqlConnection extends BaseConnection
         }
 
         if (isset($params['path'])) {
-            $result['db'] = ltrim($params['path'], '/');
+            $result['db'] = \ltrim($params['path'], '/');
         }
 
         if (!empty($params['query'])) {
-            parse_str($params['query'], $opt);
+            /** @var array $opt */
+            \parse_str($params['query'], $opt);
 
             $result['persistent'] = !empty($opt['persistent']);
 
@@ -316,9 +316,9 @@ class MysqlConnection extends BaseConnection
     public function escapeString($str)
     {
         if ($this->conn) {
-            return mysql_real_escape_string($str, $this->conn);
+            return \mysql_real_escape_string($str, $this->conn);
         } else {
-            return mysql_escape_string($str);
+            return \mysql_escape_string($str);
         }
     }
 
@@ -329,6 +329,6 @@ class MysqlConnection extends BaseConnection
 
     protected function doQuery($q)
     {
-        return mysql_query($q, $this->conn);
+        return \mysql_query($q, $this->conn);
     }
 }

@@ -16,7 +16,7 @@ class MysqlDialect implements ISqlDialect
 
     public function quote($literal, $type)
     {
-        if (is_null($literal)) {
+        if ($literal === null) {
             return 'null';
         }
 
@@ -25,7 +25,7 @@ class MysqlDialect implements ISqlDialect
         }
 
         if (($type & Type::NUMERIC) > 0) {
-            if (!is_numeric($literal)) {
+            if (!\is_numeric($literal)) {
                 throw new \InvalidArgumentException(
                     "The '{$literal}' literal must be numeric"
                 );
@@ -38,10 +38,10 @@ class MysqlDialect implements ISqlDialect
             $timestamp = false;
             if ($literal instanceof \DateTimeInterface) {
                 $timestamp = $literal->getTimestamp();
-            } elseif (is_array($literal) && isset($literal['timestamp'])) {
+            } elseif (\is_array($literal) && isset($literal['timestamp'])) {
                 $timestamp = $literal['timestamp'];
-            } elseif (is_string($literal)) {
-                $timestamp = strtotime($literal);
+            } elseif (\is_string($literal)) {
+                $timestamp = \strtotime($literal);
             }
 
             if ($timestamp === false) {
@@ -50,7 +50,7 @@ class MysqlDialect implements ISqlDialect
                 );
             }
 
-            return date("'Y-m-d H:i:s'", $timestamp);
+            return \date("'Y-m-d H:i:s'", $timestamp);
         }
 
         if ($type == Type::STRING) {
@@ -63,10 +63,10 @@ class MysqlDialect implements ISqlDialect
     public function quoteIdentifier($identifier)
     {
         $scope = '';
-        $period = strpos($identifier, '.');
+        $period = \strpos($identifier, '.');
         if ($period !== false) {
-            $scope = $this->escapeString(substr($identifier, 0, $period), '`') . '.';
-            $identifier = substr($identifier, $period + 1);
+            $scope = $this->escapeString(\substr($identifier, 0, $period), '`') . '.';
+            $identifier = \substr($identifier, $period + 1);
         }
 
         return $scope . $this->escapeString($identifier, '`');
@@ -74,7 +74,7 @@ class MysqlDialect implements ISqlDialect
 
     public function quoteWildcards($literal)
     {
-        return addcslashes($literal, '%_');
+        return \addcslashes($literal, '%_');
     }
 
     public function patternMatchOperator($isCaseSensitive, $isNegative)
@@ -85,17 +85,9 @@ class MysqlDialect implements ISqlDialect
         return $negator . 'LIKE' . $modifier;
     }
 
-    public function limitClause($limit, $offset = null)
+    public function limitClause(int $limit, int $offset = null)
     {
-        if (!is_numeric($limit)) {
-            throw new \InvalidArgumentException('Limit value must be numeric');
-        }
-
-        if (!is_null($offset) && !is_numeric($offset)) {
-            throw new \InvalidArgumentException('Offset value must be numeric');
-        }
-
-        if (is_null($offset)) {
+        if ($offset === null) {
             $result = 'LIMIT ' . $limit;
         } else {
             $result = 'LIMIT ' . $offset . ', ' . $limit;

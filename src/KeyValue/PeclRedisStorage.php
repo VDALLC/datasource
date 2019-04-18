@@ -12,7 +12,7 @@ class PeclRedisStorage implements IStorage
 
     public function __construct($addr, $persistent = true)
     {
-        if (!class_exists('\Redis')) {
+        if (!\class_exists(\Redis::class)) {
             throw new DatasourceException(
                 'The \Redis class not found. Is pecl-redis installed?'
             );
@@ -20,7 +20,8 @@ class PeclRedisStorage implements IStorage
 
         $this->backend = new \Redis();
 
-        if (preg_match('!^(.*)(?:\:(\d+)?)$!', $addr, $parts)) {
+        /** @var array $parts */
+        if (\preg_match('!^(.*)(?:\:(\d+)?)$!', $addr, $parts)) {
             $addr = $parts[1];
             $port = empty($parts[2]) ? 0 : $parts[2];
         } else {
@@ -42,7 +43,7 @@ class PeclRedisStorage implements IStorage
             return false;
         }
 
-        return json_decode($value, true);
+        return \json_decode($value, true);
     }
 
     public function getExpirationTime($key)
@@ -51,12 +52,12 @@ class PeclRedisStorage implements IStorage
             return false;
         }
 
-        return $this->backend->ttl($key) + time();
+        return $this->backend->ttl($key) + \time();
     }
 
     public function add($key, $value, $ttl = 0)
     {
-        $result = $this->backend->setnx($key, json_encode($value));
+        $result = $this->backend->setnx($key, \json_encode($value));
 
         if ($result === true && $ttl > 0) {
             $this->backend->expire($key, $ttl);
@@ -68,9 +69,9 @@ class PeclRedisStorage implements IStorage
     public function set($key, $value, $ttl = 0)
     {
         if ($ttl > 0) {
-            return $this->backend->set($key, json_encode($value), $ttl);
+            return $this->backend->set($key, \json_encode($value), $ttl);
         } else {
-            return $this->backend->set($key, json_encode($value));
+            return $this->backend->set($key, \json_encode($value));
         }
     }
 
