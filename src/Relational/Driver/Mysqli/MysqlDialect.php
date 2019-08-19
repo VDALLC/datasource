@@ -14,7 +14,7 @@ class MysqlDialect implements ISqlDialect
         $this->conn = $conn;
     }
 
-    public function quote($literal, $type)
+    public function quote($literal, int $type)
     {
         if ($literal === null) {
             return 'null';
@@ -60,7 +60,7 @@ class MysqlDialect implements ISqlDialect
         throw new \InvalidArgumentException("The '{$type}' type is unknown");
     }
 
-    public function quoteIdentifier($identifier)
+    public function quoteIdentifier(string $identifier)
     {
         $scope = '';
         $period = \strpos($identifier, '.');
@@ -72,12 +72,12 @@ class MysqlDialect implements ISqlDialect
         return $scope . $this->escapeString($identifier, '`');
     }
 
-    public function quoteWildcards($literal)
+    public function quoteWildcards(string $literal)
     {
         return \addcslashes($literal, '%_');
     }
 
-    public function patternMatchOperator($isCaseSensitive, $isNegative)
+    public function patternMatchOperator(bool $isCaseSensitive, bool $isNegative)
     {
         $modifier = $isCaseSensitive ? ' BINARY ' : ' ';
         $negator = $isNegative ? ' NOT ' : ' ';
@@ -94,6 +94,11 @@ class MysqlDialect implements ISqlDialect
         }
 
         return $result;
+    }
+
+    public function jsonGetOperator(string $path)
+    {
+        return '->>' . $this->escapeString('$.' . \ltrim($path, '.'), "'");
     }
 
     protected function escapeString($str, $encl)
