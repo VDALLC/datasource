@@ -2,9 +2,10 @@
 namespace Vda\Datasource\Relational\Driver\Mysqli;
 
 use Vda\Datasource\Relational\QueryBuilder;
+use Vda\Query\Operator\JsonGet;
+use Vda\Query\Operator\Operator;
 use Vda\Query\Select;
 use Vda\Query\Upsert;
-use Vda\Query\Operator\Operator;
 use Vda\Util\Type;
 
 class MysqlQueryBuilder extends QueryBuilder
@@ -48,6 +49,13 @@ class MysqlQueryBuilder extends QueryBuilder
         $this->buildUpdateList($updateFields, $updateValues);
 
         $this->leaveState();
+    }
+
+    public function processJsonGet(JsonGet $get)
+    {
+        $this->query .= 'JSON_UNQUOTE(JSON_EXTRACT(';
+        $get->getDoc()->onProcess($this);
+        $this->query .= ', ' . $this->dialect->quote('$.' . \ltrim($get->getPath(), '.'), Type::STRING) . '))';
     }
 
     protected function buildLockMode($mode)
