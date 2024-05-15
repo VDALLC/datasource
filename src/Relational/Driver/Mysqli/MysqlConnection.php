@@ -287,7 +287,7 @@ class MysqlConnection extends BaseConnection
         }
 
         $result = [
-            'host'       => 'localhost',
+            'host'       => $params['host'],
             'user'       => 'root',
             'pass'       => '',
             'db'         => null,
@@ -296,8 +296,6 @@ class MysqlConnection extends BaseConnection
             'port'       => null,
             'socket'     => null,
         ];
-
-        $result['host'] = $params['host'];
 
         if (!empty($params['port'])) {
             $result['port'] = $params['port'];
@@ -331,11 +329,11 @@ class MysqlConnection extends BaseConnection
 
     public function escapeString($str)
     {
-        if ($this->mysql) {
-            return $this->mysql->real_escape_string($str);
-        } else {
+        if (!$this->mysql) {
             throw new DatasourceException('No database connection');
         }
+
+        return $this->mysql->real_escape_string($str);
     }
 
     public function setPersistable($flag)
@@ -345,6 +343,6 @@ class MysqlConnection extends BaseConnection
 
     protected function doQuery($q)
     {
-        return $this->mysql->query($q);;
+        return $this->mysql->query($q);
     }
 }
