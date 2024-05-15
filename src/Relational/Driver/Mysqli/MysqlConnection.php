@@ -84,8 +84,12 @@ class MysqlConnection extends BaseConnection
 
     public function disconnect()
     {
-        if ($this->isConnected()) {
-            $this->mysql->close();
+        if ($this->mysql) {
+            try {
+                $this->mysql->close();
+            } catch (\mysqli_sql_exception $e) {
+                // nop, already closed
+            }
             $this->mysql = null;
         }
 
@@ -97,7 +101,16 @@ class MysqlConnection extends BaseConnection
 
     public function isConnected()
     {
-        return !empty($this->mysql) && $this->mysql->ping();
+        if (empty($this->mysql)) {
+            return false;
+        }
+
+        try {
+            return $this->mysql->ping();
+        } catch (\mysqli_sql_exception $e) {
+            $this->disconnect();
+            return false;
+        }
     }
 
     public function query($q)
