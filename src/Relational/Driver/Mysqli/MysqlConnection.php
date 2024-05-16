@@ -84,8 +84,12 @@ class MysqlConnection extends BaseConnection
 
     public function disconnect()
     {
-        if ($this->isConnected()) {
-            $this->mysql->close();
+        if ($this->mysql) {
+            try {
+                $this->mysql->close();
+            } catch (\mysqli_sql_exception $e) {
+                // nop, already closed
+            }
             $this->mysql = null;
         }
 
@@ -97,7 +101,16 @@ class MysqlConnection extends BaseConnection
 
     public function isConnected()
     {
-        return !empty($this->mysql) && $this->mysql->ping();
+        if (empty($this->mysql)) {
+            return false;
+        }
+
+        try {
+            return $this->mysql->ping();
+        } catch (\mysqli_sql_exception $e) {
+            $this->disconnect();
+            return false;
+        }
     }
 
     public function query($q)
@@ -274,7 +287,7 @@ class MysqlConnection extends BaseConnection
         }
 
         $result = [
-            'host'       => 'localhost',
+            'host'       => $params['host'],
             'user'       => 'root',
             'pass'       => '',
             'db'         => null,
@@ -283,8 +296,6 @@ class MysqlConnection extends BaseConnection
             'port'       => null,
             'socket'     => null,
         ];
-
-        $result['host'] = $params['host'];
 
         if (!empty($params['port'])) {
             $result['port'] = $params['port'];
@@ -318,11 +329,11 @@ class MysqlConnection extends BaseConnection
 
     public function escapeString($str)
     {
-        if ($this->mysql) {
-            return $this->mysql->real_escape_string($str);
-        } else {
+        if (!$this->mysql) {
             throw new DatasourceException('No database connection');
         }
+
+        return $this->mysql->real_escape_string($str);
     }
 
     public function setPersistable($flag)
@@ -332,6 +343,6 @@ class MysqlConnection extends BaseConnection
 
     protected function doQuery($q)
     {
-        return $this->mysql->query($q);;
+        return $this->mysql->query($q);
     }
 }
